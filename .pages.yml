@@ -1,0 +1,72 @@
+media:
+  - name: article_images
+    label: Article Images
+    input: assets/uploads/articles
+    output: /assets/uploads/articles
+    rename: safe
+    categories: [image]
+
+content:
+  - name: posts
+    label: Articles
+    type: collection
+    path: content/posts
+    format: yaml-frontmatter
+    view:
+      fields: [title, date, tags]
+      primary: title
+      sort: [date, title]
+      search: [title, summary, tags]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+        options:
+          maxlength: 160
+
+      - name: date
+        label: Date
+        type: date
+        required: true
+
+      - name: tags
+        label: Tags
+        type: string
+        required: true
+        list:
+          min: 1
+        description: "第 1 个 Tag 是首页文章卡片左上角显示的主 Tag。请把主 Tag 保持在列表第一项；正式开发前会专门验证当前 Pages CMS 是否支持直接拖动排序。"
+
+      - name: summary
+        label: Summary
+        type: text
+        required: true
+        description: "首页与 ARTICLE 列表使用的完整摘要。"
+        options:
+          maxlength: 800
+
+      - name: body
+        label: Content
+        type: rich-text
+        required: true
+        options:
+          format: markdown
+          switcher: false
+          media: article_images
+          categories: [image]
+          rename: safe
+
+settings:
+  content:
+    merge: true
+  commit:
+    identity: user
+    templates:
+      create: "content: create {path}"
+      update: "content: update {path}"
+      delete: "content: delete {path}"
+      rename: "content: rename {oldPath} -> {newPath}"
