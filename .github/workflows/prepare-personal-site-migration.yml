@@ -60,7 +60,7 @@ jobs:
         \ production URL in deployment workflow', 'Fail before export if Published database secret is absent']}\n(p / 'MIGRATION-BASELINE.json').write_text(json.dumps(manifest,\
         \ ensure_ascii=False, indent=2))\nprint('Migration patches applied to the temporary package only.')\nPY"
     - name: Setup Node
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v7
       with:
         node-version: '22'
     - name: Install Yarn
