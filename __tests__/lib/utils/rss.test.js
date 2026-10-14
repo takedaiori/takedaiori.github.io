@@ -61,7 +61,7 @@ describe('generateRss', () => {
     expect(addItemMock.mock.calls.map(([item]) => item.title)).toEqual(['Article 5', 'Article 4', 'Article 3'])
     for (const [item] of addItemMock.mock.calls) {
       expect(item.description).toMatch(/^Summary /)
-      expect(item.link).toMatch(/^https:\/\/example.com\/article\//)
+      expect(item.link).toMatch(/^https:\/\/test.com\/article\//)
       expect(item).not.toHaveProperty('content')
     }
     expect(getPostBlocks).not.toHaveBeenCalled()
