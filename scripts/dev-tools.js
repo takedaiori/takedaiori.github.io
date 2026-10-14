@@ -106,7 +106,8 @@ function clean() {
   dirsToClean.forEach(dir => {
     const fullPath = path.join(process.cwd(), dir)
     if (fs.existsSync(fullPath)) {
-      runCommand(`rm -rf ${fullPath}`, `清理 ${dir}`)
+      fs.rmSync(fullPath, { recursive: true, force: true })
+      log(`✅ 清理 ${dir} 完成`, 'green')
     } else {
       log(`📁 ${dir} 不存在，跳过`, 'cyan')
     }

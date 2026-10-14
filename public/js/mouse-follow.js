@@ -43,7 +43,8 @@ function createMouseCanvas() {
       const obj = arguments[i]
       if (!obj) continue
       for (const key in obj) {
-        if (obj.hasOwnProperty(key)) {
+        if (key !== '__proto__' && key !== 'constructor' && key !== 'prototype' &&
+            Object.prototype.hasOwnProperty.call(obj, key)) {
           if (
             typeof obj[key] === 'object' &&
             obj[key] !== null &&

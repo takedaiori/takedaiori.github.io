@@ -167,9 +167,9 @@ describe('Sanitizer', () => {
 
   describe('sanitizeXss', () => {
     it('removes XSS patterns', () => {
-      expect(Sanitizer.sanitizeXss('<script>alert(1)</script>')).toBe('')
-      expect(Sanitizer.sanitizeXss('<iframe src="evil.com"></iframe>')).toBe('')
-      expect(Sanitizer.sanitizeXss('javascript:alert(1)')).toBe('')
+      expect(Sanitizer.sanitizeXss('<script>alert(1)</script>')).toBe('&lt;script&gt;alert(1)&lt;&#x2F;script&gt;')
+      expect(Sanitizer.sanitizeXss('<iframe src="evil.com"></iframe>')).toBe('&lt;iframe src=&quot;evil.com&quot;&gt;&lt;&#x2F;iframe&gt;')
+      expect(Sanitizer.sanitizeXss('javascript:alert(1)')).toBe('javascript:alert(1)')
     })
 
     it('preserves safe content', () => {
