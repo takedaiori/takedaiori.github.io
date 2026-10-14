@@ -1,0 +1,202 @@
+name: Install page media pack
+
+on:
+  workflow_dispatch:
+    inputs:
+      package_name:
+        description: 'ZIP file at repository root (for example: Insignificantia-page-media.zip)'
+        required: true
+        default: 'Insignificantia-page-media.zip'
+        type: string
+  push:
+    branches:
+      - main
+    paths:
+      - 'Insignificantia-page-media.zip'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: page-media-maintenance
+  cancel-in-progress: false
+
+jobs:
+  install-page-media:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve media package
+        id: pack
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            PACK='${{ inputs.package_name }}'
+          else
+            PACK='Insignificantia-page-media.zip'
+          fi
+
+          if [[ -z "$PACK" || "$PACK" == */* || "$PACK" != *.zip ]]; then
+            echo "Invalid package name: $PACK"
+            echo "The ZIP must be a .zip file stored at the repository root."
+            exit 1
+          fi
+
+          if [[ ! -f "$PACK" ]]; then
+            echo "Package not found at repository root: $PACK"
+            exit 1
+          fi
+
+          echo "name=$PACK" >> "$GITHUB_OUTPUT"
+
+      - name: Safely extract package
+        shell: bash
+        env:
+          PACK: ${{ steps.pack.outputs.name }}
+        run: |
+          DEST="$RUNNER_TEMP/insignificantia-page-media"
+          rm -rf "$DEST"
+          mkdir -p "$DEST"
+
+          python - "$PACK" "$DEST" <<'PY'
+          import sys
+          import zipfile
+          from pathlib import PurePosixPath
+
+          pack, dest = sys.argv[1], sys.argv[2]
+
+          with zipfile.ZipFile(pack) as zf:
+              for info in zf.infolist():
+                  path = PurePosixPath(info.filename)
+                  if path.is_absolute() or '..' in path.parts:
+                      raise SystemExit(f'Unsafe ZIP path: {info.filename}')
+              zf.extractall(dest)
+          PY
+
+      - name: Validate and install page media
+        id: install
+        shell: bash
+        run: |
+          ROOT="$RUNNER_TEMP/insignificantia-page-media"
+          INSTALLED_FILE="$RUNNER_TEMP/installed-page-media.txt"
+          : > "$INSTALLED_FILE"
+
+          validate_webp() {
+            python - "$1" <<'PY'
+          import sys
+
+          path = sys.argv[1]
+          with open(path, 'rb') as f:
+              header = f.read(12)
+
+          if len(header) < 12 or header[:4] != b'RIFF' or header[8:12] != b'WEBP':
+              raise SystemExit(f'Not a valid WebP file: {path}')
+          PY
+          }
+
+          install_slot() {
+            local target="$1"
+            shift
+            local matches=()
+            local candidate
+
+            for candidate in "$@"; do
+              if [[ -f "$ROOT/$candidate" ]]; then
+                matches+=("$ROOT/$candidate")
+              fi
+            done
+
+            if (( ${#matches[@]} > 1 )); then
+              echo "More than one source file maps to: $target"
+              printf '  %s\n' "${matches[@]}"
+              exit 1
+            fi
+
+            if (( ${#matches[@]} == 1 )); then
+              validate_webp "${matches[0]}"
+              mkdir -p "$(dirname "$target")"
+              cp -f -- "${matches[0]}" "$target"
+              echo "$target" >> "$INSTALLED_FILE"
+              echo "Installed: ${matches[0]#$ROOT/} -> $target"
+            fi
+          }
+
+          # Hero: 3 slots.
+          # Recommended ZIP names: hero/Hero1.webp ... hero/Hero3.webp
+          for i in 1 2 3; do
+            n=$(printf '%02d' "$i")
+            install_slot \
+              "public/images/insignificantia/hero/hero-$n.webp" \
+              "hero/Hero$i.webp" \
+              "hero/hero-$n.webp" \
+              "Hero$i.webp" \
+              "hero-$n.webp"
+          done
+
+          # About portfolio: 12 slots.
+          # Recommended ZIP names: about/About1.webp ... about/About12.webp
+          for i in $(seq 1 12); do
+            n=$(printf '%02d' "$i")
+            install_slot \
+              "public/images/insignificantia/portfolio/work-$n.webp" \
+              "about/About$i.webp" \
+              "portfolio/work-$n.webp" \
+              "About$i.webp" \
+              "work-$n.webp"
+          done
+
+          COUNT=$(wc -l < "$INSTALLED_FILE" | tr -d ' ')
+          if [[ "$COUNT" -eq 0 ]]; then
+            echo 'No recognized page-media files were found in the ZIP.'
+            echo 'Expected Hero1..Hero3 and/or About1..About12 WebP files.'
+            exit 1
+          fi
+
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "Installed $COUNT page-media file(s)."
+
+      - name: Show installed files
+        shell: bash
+        run: |
+          echo '### Installed page media' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo 'The workflow copies WebP bytes as-is. It does not resize, recompress or transcode images.' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '```text' >> "$GITHUB_STEP_SUMMARY"
+          cat "$RUNNER_TEMP/installed-page-media.txt" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Commit installed media and consume package
+        shell: bash
+        env:
+          PACK: ${{ steps.pack.outputs.name }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          while IFS= read -r path; do
+            git add -- "$path"
+          done < "$RUNNER_TEMP/installed-page-media.txt"
+
+          git rm -f -- "$PACK"
+
+          if git diff --cached --quiet; then
+            echo 'No repository changes to commit.'
+            exit 0
+          fi
+
+          git commit -m 'Media maintenance: install page image pack'
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Next step
+        shell: bash
+        run: |
+          echo '### Next step' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo 'After this workflow succeeds, run **Deploy NotionNext to GitHub Pages** so the new media is included in the published site.' >> "$GITHUB_STEP_SUMMARY"

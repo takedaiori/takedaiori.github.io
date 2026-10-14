@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "source_repository": "insignificantia-lab/insignificantia-lab.github.io",
+  "source_commit": "60710535cbe7bef58854d186d8e72e707326813a",
+  "production_repository": "takedaiori/takedaiori.github.io",
+  "production_url": "https://takedaiori.github.io",
+  "changes": [
+    "Deployment URL takes precedence over Notion LINK",
+    "Static and API RSS use the same deployment URL",
+    "RSS uses an empty subpath when none is configured",
+    "Explicit production URL in deployment workflow",
+    "Fail before export if Published database secret is absent"
+  ]
+}

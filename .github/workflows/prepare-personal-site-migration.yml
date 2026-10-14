@@ -1,0 +1,166 @@
+name: Prepare personal-site migration package
+'on':
+  workflow_dispatch: null
+permissions:
+  contents: read
+concurrency:
+  group: prepare-personal-site-migration
+  cancel-in-progress: false
+jobs:
+  prepare:
+    if: github.repository == 'insignificantia-lab/insignificantia-lab.github.io'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      NOTION_PAGE_ID: ${{ secrets.NOTION_PAGE_ID }}
+      NEXT_PUBLIC_THEME: insignificantia
+      NEXT_PUBLIC_THEME_SWITCH: 'false'
+      NEXT_PUBLIC_WIDGET_PET: 'false'
+      NEXT_PUBLIC_WIDGET_PET_SWITCH_THEME: 'false'
+      NEXT_PUBLIC_POSTS_PER_PAGE: '15'
+      NEXT_PUBLIC_LINK: https://takedaiori.github.io
+      BUILD_PREFETCH_ENABLED: 'false'
+      STATIC_PAGE_GENERATION_TIMEOUT: '600'
+    steps:
+    - name: Read fixed stable source
+      uses: actions/checkout@v4
+      with:
+        ref: b85c96a0259c1b86328e70f93a82ba25c97def15
+        persist-credentials: false
+    - name: Check source and required secret
+      run: "test \"$(git rev-parse HEAD)\" = \"b85c96a0259c1b86328e70f93a82ba25c97def15\"\nif [ -z \"$NOTION_PAGE_ID\" ];\
+        \ then\n  echo 'Missing Published database secret; stop before using the default demo database.'\n  exit 1\nfi\necho\
+        \ \"MIGRATION_ROOT=$RUNNER_TEMP/insignificantia-personal-migration\" >> \"$GITHUB_ENV\"\nmkdir -p \"$RUNNER_TEMP/insignificantia-personal-migration\"\
+        \ngit archive HEAD | tar -x -C \"$RUNNER_TEMP/insignificantia-personal-migration\""
+    - name: Prepare host fixes in temporary package
+      run: "python - <<'PY'\nfrom pathlib import Path\nimport json\nimport os\np = Path(os.environ['MIGRATION_ROOT'])\nconfig\
+        \ = p / 'lib/config.js'\ns = config.read_text()\nanchor = \"  const getValue = (value, fallback) => (hasVal(value)\
+        \ ? value : fallback)\"\nguard = \"  // A migration build must consistently use its deployment host.\\n  // Notion\
+        \ Config may retain the old site's LINK.\\n  if (key === 'LINK' && process.env.NEXT_PUBLIC_LINK?.trim()) {\\n    return\
+        \ process.env.NEXT_PUBLIC_LINK.trim()\\n  }\\n\\n\"\nif s.count(anchor) != 1:\n    raise SystemExit('Unexpected lib/config.js;\
+        \ stop rather than patch a different version')\nconfig.write_text(s.replace(anchor, guard + anchor, 1))\ndeploy =\
+        \ p / '.github/workflows/deploy-pages.yml'\ns = deploy.read_text()\nold = 'NEXT_PUBLIC_LINK: https://' + chr(36) +\
+        \ '{{ github.repository_owner }}.github.io'\nif s.count(old) != 1:\n    raise SystemExit('Unexpected deployment LINK\
+        \ configuration')\ns = s.replace(old, 'NEXT_PUBLIC_LINK: https://takedaiori.github.io', 1)\nold = '      - name: Export\
+        \ static site\\n        run: yarn export'\nnew = '      - name: Validate published data source\\n        run: |\\\
+        n          if [ -z \"$NOTION_PAGE_ID\" ]; then\\n            echo \"Missing NOTION_PAGE_ID repository secret. Stop;\
+        \ do not use the upstream demo database.\"\\n            exit 1\\n          fi\\n\\n' + old\nif s.count(old) != 1:\n\
+        \    raise SystemExit('Unexpected export step')\ns = s.replace(old, new, 1)\ndeploy.write_text(s)\nrss = p / 'lib/utils/rss.js'\n\
+        s = rss.read_text()\nold = '  const LINK = siteInfo?.link'\nnew = \"  const LINK = siteConfig('LINK', siteInfo?.link,\
+        \ NOTION_CONFIG)\"\nif s.count(old) != 1:\n    raise SystemExit('Unexpected static RSS LINK configuration')\ns = s.replace(old,\
+        \ new, 1)\nold = '  const SUB_PATH = NOTION_CONFIG?.SUB_PATH || BLOG.SUB_PATH'\nif s.count(old) != 1:\n    raise SystemExit('Unexpected\
+        \ static RSS SUB_PATH configuration')\ns = s.replace(old, old + \" || ''\", 1)\nrss.write_text(s)\nrss_api = p / 'pages/api/rss.js'\n\
+        s = rss_api.read_text()\nold = \"import BLOG from '@/blog.config'\"\nif s.count(old) != 1:\n    raise SystemExit('Unexpected\
+        \ RSS API imports')\ns = s.replace(old, old + \"\\nimport { siteConfig } from '@/lib/config'\", 1)\nold = '  const\
+        \ LINK = siteInfo?.link || BLOG.LINK'\nif s.count(old) != 1:\n    raise SystemExit('Unexpected RSS API LINK configuration')\n\
+        s = s.replace(old, new, 1)\nrss_api.write_text(s)\nmanifest = {'version': 2, 'source_repository': 'insignificantia-lab/insignificantia-lab.github.io',\
+        \ 'source_commit': 'b85c96a0259c1b86328e70f93a82ba25c97def15', 'production_repository': 'takedaiori/takedaiori.github.io',\
+        \ 'production_url': 'https://takedaiori.github.io', 'changes': ['Deployment URL takes precedence over Notion LINK',\
+        \ 'Static and API RSS use the same deployment URL', 'RSS uses an empty subpath when none is configured', 'Explicit\
+        \ production URL in deployment workflow', 'Fail before export if Published database secret is absent']}\n(p / 'MIGRATION-BASELINE.json').write_text(json.dumps(manifest,\
+        \ ensure_ascii=False, indent=2))\nprint('Migration patches applied to the temporary package only.')\nPY"
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+    - name: Install Yarn
+      run: npm install -g yarn@1.22.22
+    - name: Install dependencies
+      working-directory: ${{ env.MIGRATION_ROOT }}
+      run: yarn install --frozen-lockfile
+    - name: Confirm the metadata regression
+      working-directory: ${{ env.MIGRATION_ROOT }}
+      run: "cp pages/_app.js \"$RUNNER_TEMP/phase1-fixed-app.js\"\ntrap 'cp \"$RUNNER_TEMP/phase1-fixed-app.js\" pages/_app.js'\
+        \ EXIT\npython - <<'PY'\nfrom pathlib import Path\np = Path('pages/_app.js')\nfixed = \"        {/* Metadata must\
+        \ render even while the dynamic theme layout is loading. */}\\n        <SEO {...pageProps} />\\n        <GLayout {...pageProps}>\"\
+        \noriginal = \"        <GLayout {...pageProps}>\\n          <SEO {...pageProps} />\"\ns = p.read_text()\nif s.count(fixed)\
+        \ != 1:\n    raise SystemExit('Unexpected SEO placement')\np.write_text(s.replace(fixed, original, 1))\nPY\nif yarn\
+        \ test --runInBand __tests__/pages/app-seo.test.js > \"$RUNNER_TEMP/phase1-before.log\" 2>&1; then\n  echo 'Regression\
+        \ test unexpectedly passed before the fix.'\n  exit 1\nfi\ncat \"$RUNNER_TEMP/phase1-before.log\"\ncp \"$RUNNER_TEMP/phase1-fixed-app.js\"\
+        \ pages/_app.js\nyarn test --runInBand __tests__/pages/app-seo.test.js\n"
+    - name: Check code
+      working-directory: ${{ env.MIGRATION_ROOT }}
+      run: yarn lint && yarn type-check && yarn test --runInBand __tests__/pages/app-seo.test.js __tests__/components/SEO.test.js
+    - name: Export for personal root site
+      working-directory: ${{ env.MIGRATION_ROOT }}
+      run: yarn export
+    - name: Package tracked source with migration fixes
+      run: "python - <<'PY'\nimport os\nimport subprocess\nimport zipfile\nfrom pathlib import Path\nroot = Path(os.environ['MIGRATION_ROOT'])\n\
+        paths = subprocess.check_output(['git', 'ls-files', '-z']).decode().split(chr(0))\npaths = [p for p in paths if p]\
+        \ + ['MIGRATION-BASELINE.json']\nwith zipfile.ZipFile(Path(os.environ['RUNNER_TEMP']) / 'Insignificantia-personal-site-source.zip',\
+        \ 'w', zipfile.ZIP_DEFLATED) as z:\n    for name in paths:\n        if name in ['.env', '.env.local', '.env.production',\
+        \ '.env.development']:\n            raise SystemExit('Do not package a real environment credential file')\n      \
+        \  p = root / name\n        if p.is_file():\n            z.write(p, name)\nprint('Packaged source only, without dependencies,\
+        \ build output, or repository credentials.')\nPY"
+    - name: Upload migration package
+      uses: actions/upload-artifact@v4
+      with:
+        name: personal-site-migration-source
+        path: ${{ runner.temp }}/Insignificantia-personal-site-source.zip
+        if-no-files-found: error
+        retention-days: 14
+    - name: Verify personal-site output
+      working-directory: ${{ env.MIGRATION_ROOT }}
+      run: "python - <<'PY'\nfrom pathlib import Path\nfrom html.parser import HTMLParser\nfrom urllib.parse import urlparse\n\
+        import json\nimport xml.etree.ElementTree as ET\n\nroot = Path('out')\nexpected = 'takedaiori.github.io'\nerrors =\
+        \ []\n# The site's dashboard and auth layouts are empty in this theme. Their generated\n# routes are internal, not\
+        \ public content. Still inspect any metadata, assets,\n# and refresh tags they contain for the old host.\nnon_content_roots\
+        \ = {'dashboard.html', 'auth.html'}\nnon_content_prefixes = ('dashboard/', 'auth/')\nexemptions = []\n\ndef personal_url(value,\
+        \ label):\n    parsed = urlparse(value or '')\n    if parsed.scheme != 'https' or parsed.netloc != expected:\n   \
+        \     errors.append(label + ': expected an HTTPS URL on the personal host')\n\ndef exists_route(name):\n    return\
+        \ (root / (name + '.html')).is_file() or (root / name / 'index.html').is_file()\n\nfor route in ['index', 'page/1',\
+        \ 'archive', 'about', '404']:\n    if not exists_route(route):\n        errors.append('Missing required route: ' +\
+        \ route)\nfor asset in ['sitemap.xml', 'rss/feed.xml', 'rss/atom.xml', 'rss/feed.json']:\n    if not (root / asset).is_file():\n\
+        \        errors.append('Missing required feed/sitemap: ' + asset)\n\nclass Inspect(HTMLParser):\n    def __init__(self,\
+        \ filename):\n        super().__init__()\n        self.filename = filename\n        self.canonicals = []\n\n    def\
+        \ handle_starttag(self, tag, attributes):\n        a = dict(attributes)\n        if tag == 'link' and a.get('rel')\
+        \ == 'canonical':\n            value = a.get('href', '')\n            self.canonicals.append(value)\n            personal_url(value,\
+        \ self.filename + ': canonical')\n        if tag == 'meta' and a.get('property') == 'og:url':\n            personal_url(a.get('content',\
+        \ ''), self.filename + ': Open Graph URL')\n        if tag in ['script', 'img', 'source', 'link']:\n            value\
+        \ = a.get('src') or a.get('href') or ''\n            if urlparse(value).netloc == 'insignificantia-lab.github.io':\n\
+        \                errors.append(self.filename + ': runtime asset depends on the organization site')\n        if tag\
+        \ == 'meta' and a.get('http-equiv', '').lower() == 'refresh':\n            if 'insignificantia-lab.github.io' in a.get('content',\
+        \ ''):\n                errors.append(self.filename + ': redirects to the organization site')\n\nhtml_files = list(root.rglob('*.html'))\n\
+        for filename in html_files:\n    route = filename.relative_to(root).as_posix()\n    parser = Inspect(route)\n    parser.feed(filename.read_text(errors='replace'))\n\
+        \    if not parser.canonicals:\n        if route in non_content_roots or route.startswith(non_content_prefixes):\n\
+        \            exemptions.append(route)\n        else:\n            errors.append(route + ': no canonical metadata')\n\
+        \ndef parse_xml(path):\n    if not path.is_file():\n        return None\n    try:\n        return ET.parse(path).getroot()\n\
+        \    except ET.ParseError:\n        errors.append(str(path) + ': malformed XML')\n        return None\n\nfor filename\
+        \ in root.glob('sitemap*.xml'):\n    tree = parse_xml(filename)\n    if tree is not None:\n        locations = [node\
+        \ for node in tree.iter() if node.tag.split('}')[-1] == 'loc']\n        if not locations:\n            errors.append(str(filename)\
+        \ + ': no sitemap locations')\n        for node in locations:\n            personal_url(node.text, str(filename) +\
+        \ ': location')\n\nrss_path = root / 'rss/feed.xml'\ntree = parse_xml(rss_path)\nif tree is not None:\n    channel\
+        \ = tree.find('channel')\n    if channel is None:\n        errors.append(str(rss_path) + ': missing RSS channel')\n\
+        \    else:\n        personal_url(channel.findtext('link'), 'RSS channel link')\n        for item in channel.findall('item'):\n\
+        \            personal_url(item.findtext('link'), 'RSS article link')\n            guid = item.find('guid')\n     \
+        \       if guid is not None and guid.get('isPermaLink', 'true') != 'false':\n                personal_url(guid.text,\
+        \ 'RSS article permalink')\n\natom_path = root / 'rss/atom.xml'\ntree = parse_xml(atom_path)\nif tree is not None:\n\
+        \    ns = '{http://www.w3.org/2005/Atom}'\n    if tree.tag != ns + 'feed':\n        errors.append(str(atom_path) +\
+        \ ': expected Atom feed')\n    else:\n        links = tree.findall(ns + 'link')\n        if not links:\n         \
+        \   errors.append('Atom feed: missing feed links')\n        for link in links:\n            personal_url(link.get('href'),\
+        \ 'Atom feed link')\n        for entry in tree.findall(ns + 'entry'):\n            personal_url(entry.findtext(ns\
+        \ + 'id'), 'Atom entry ID')\n            for link in entry.findall(ns + 'link'):\n                personal_url(link.get('href'),\
+        \ 'Atom article link')\n\njson_path = root / 'rss/feed.json'\nif json_path.is_file():\n    try:\n        feed = json.loads(json_path.read_text())\n\
+        \        personal_url(feed.get('home_page_url'), 'JSON feed homepage')\n        if feed.get('feed_url'):\n       \
+        \     personal_url(feed['feed_url'], 'JSON feed URL')\n        for item in feed.get('items', []):\n            personal_url(item.get('url'),\
+        \ 'JSON feed article URL')\n    except (ValueError, AttributeError):\n        errors.append('Malformed JSON feed')\n\
+        \nreport = {\n    'version': 4,\n    'production_url': 'https://takedaiori.github.io',\n    'html_pages_checked':\
+        \ len(html_files),\n    'article_pages_checked': sum(1 for f in html_files if f.relative_to(root).as_posix().startswith('article/')),\n\
+        \    'category_pages_checked': sum(1 for f in html_files if f.relative_to(root).as_posix().startswith('category/')),\n\
+        \    'tag_pages_checked': sum(1 for f in html_files if f.relative_to(root).as_posix().startswith('tag/')),\n    'coverage_note':\
+        \ 'An empty Published Post library does not validate article/category/tag routes for launch.',\n    'canonical_exemptions':\
+        \ exemptions,\n    'checks': ['Required routes', 'RSS/Atom/JSON feed and sitemap owned URLs', 'Canonical and Open\
+        \ Graph host', 'No organization-host runtime assets or meta refresh'],\n    'errors': errors,\n    'result': 'PASS'\
+        \ if not errors else 'FAIL',\n}\nPath('../migration-preflight-report.json').write_text(json.dumps(report, ensure_ascii=False,\
+        \ indent=2))\nprint(json.dumps(report, ensure_ascii=False, indent=2))\nif errors:\n    raise SystemExit(1)\nPY"
+    - name: Upload verification report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: personal-site-migration-verification
+        path: ${{ runner.temp }}/migration-preflight-report.json
+        if-no-files-found: warn
+        retention-days: 14
+    - name: Next step
+      run: echo 'Package prepared and verified. This workflow does not commit, push, or deploy either site. Import the package
+        into the personal repository after its backup branch is confirmed.' >> "$GITHUB_STEP_SUMMARY"

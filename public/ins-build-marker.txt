@@ -1,0 +1,6 @@
+Insignificantia mobile-gutter build marker
+version: V1.9.1
+expected mobile gutters:
+- ARTICLE / Archive Result: 18px outer padding
+- ARCHIVE: 18px outer padding
+- Article Detail: 20px outer padding
