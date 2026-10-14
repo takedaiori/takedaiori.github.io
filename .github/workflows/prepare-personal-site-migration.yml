@@ -23,7 +23,7 @@ jobs:
       STATIC_PAGE_GENERATION_TIMEOUT: '600'
     steps:
     - name: Read fixed stable source
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
       with:
         ref: b85c96a0259c1b86328e70f93a82ba25c97def15
         persist-credentials: false
