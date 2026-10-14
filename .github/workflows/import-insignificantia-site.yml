@@ -1,0 +1,131 @@
+name: Import reviewed Insignificantia site
+'on':
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: inspect first; import replaces target main after backups
+        required: true
+        default: inspect
+        type: choice
+        options:
+        - inspect
+        - import
+      confirmation:
+        description: 'Only for import: IMPORT takedaiori/takedaiori.github.io'
+        required: false
+        default: ''
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: insignificantia-site-import
+  cancel-in-progress: false
+jobs:
+  import:
+    if: github.repository == 'takedaiori/takedaiori.github.io' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      IMPORT_MODE: ${{ inputs.mode }}
+      IMPORT_CONFIRM: ${{ inputs.confirmation }}
+      IMPORT_PAT: ${{ secrets.IMPORT_PAT }}
+    steps:
+    - name: Checkout target setup state
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - name: Validate package and inspect or import source
+      shell: bash
+      run: "python3 - <<'PYIMPORT'\nimport base64\nimport hashlib\nimport json\nimport os\nfrom pathlib import Path,\
+        \ PurePosixPath\nimport stat\nimport subprocess\nimport sys\nimport tempfile\nimport zipfile\n\nTARGET =\
+        \ 'takedaiori/takedaiori.github.io'\nSOURCE = '60710535cbe7bef58854d186d8e72e707326813a'\nZIP_SHA = 'a1812a5166085403cc69ae74735cbdeef02a31f1a2bee0f4124590d9b6085dd6'\n\
+        ORIGINAL = '4cd7084ac7252ce73ce05040325a111156ac0106'\n\ndef check_package(package, dest):\n    if hashlib.sha256(package.read_bytes()).hexdigest()\
+        \ != ZIP_SHA:\n        raise ValueError('Package SHA256 differs from reviewed package. Stop.')\n    with\
+        \ zipfile.ZipFile(package) as z:\n        seen = set()\n        for i in z.infolist():\n            n =\
+        \ i.filename\n            path = PurePosixPath(n)\n            if '\\\\' in n or n.startswith('/') or ':'\
+        \ in n or '..' in path.parts:\n                raise ValueError('Unsafe archive path')\n            if n\
+        \ in seen or any(p in ['.git', 'node_modules', 'out', '.next'] for p in path.parts):\n                raise\
+        \ ValueError('Duplicate or disallowed path')\n            seen.add(n)\n            mode = i.external_attr\
+        \ >> 16\n            if stat.S_ISLNK(mode) or i.flag_bits & 1:\n                raise ValueError('Symlink\
+        \ or encrypted archive entry')\n            if path.name.startswith('.env') and path.name != '.env.example':\n\
+        \                raise ValueError('Environment credentials must not be imported')\n            if i.file_size\
+        \ > 25 * 1024 * 1024:\n                raise ValueError('Oversized archive entry')\n        if sum(i.file_size\
+        \ for i in z.infolist()) > 100 * 1024 * 1024:\n            raise ValueError('Oversized archive')\n     \
+        \   manifest = json.loads(z.read('MIGRATION-BASELINE.json'))\n        if (manifest.get('source_commit')\
+        \ != SOURCE or\n            manifest.get('source_repository') != 'insignificantia-lab/insignificantia-lab.github.io'\
+        \ or\n            manifest.get('production_repository') != TARGET or\n            manifest.get('production_url')\
+        \ != 'https://takedaiori.github.io'):\n            raise ValueError('Unexpected manifest')\n        required\
+        \ = ['package.json', 'yarn.lock', 'LICENSE',\n            '.github/workflows/deploy-pages.yml', '.github/workflows/install-page-media-pack.yml',\n\
+        \            'themes/insignificantia/components/AboutPage.js',\n            'themes/insignificantia/components/ArticleToc.js',\
+        \ 'public/favicon.ico']\n        required += [f'public/images/insignificantia/hero/hero-{i:02d}.webp' for\
+        \ i in range(1,4)]\n        required += [f'public/images/insignificantia/portfolio/work-{i:02d}.webp' for\
+        \ i in range(1,13)]\n        if any(n not in seen for n in required):\n            raise ValueError('Incomplete\
+        \ source package')\n        deploy = z.read('.github/workflows/deploy-pages.yml').decode()\n        if 'NEXT_PUBLIC_LINK:\
+        \ https://takedaiori.github.io' not in deploy or 'Validate published data source' not in deploy:\n     \
+        \       raise ValueError('Production workflow fixes missing')\n        for i in z.infolist():\n        \
+        \    if i.is_dir(): continue\n            dst = dest / i.filename\n            dst.parent.mkdir(parents=True,\
+        \ exist_ok=True)\n            dst.write_bytes(z.read(i))\n            if (i.external_attr >> 16) & 0o111:\
+        \ dst.chmod(0o755)\n        return manifest, sorted(n for n in seen if not n.endswith('/'))\n\ndef git(args,\
+        \ cwd, env=None):\n    return subprocess.run(['git', *args], cwd=cwd, env=env,\n        capture_output=True,\
+        \ text=True, check=True).stdout.strip()\n\ndef main():\n    if os.environ.get('GITHUB_REPOSITORY') != TARGET\
+        \ or os.environ.get('GITHUB_REF') != 'refs/heads/main':\n        raise ValueError('Run only on target main')\n\
+        \    mode = os.environ.get('IMPORT_MODE', 'inspect')\n    if mode not in ['inspect', 'import']: raise ValueError('Invalid\
+        \ mode')\n    if mode == 'import' and os.environ.get('IMPORT_CONFIRM') != 'IMPORT ' + TARGET:\n        raise\
+        \ ValueError('Confirmation does not match target')\n    if not os.environ.get('IMPORT_PAT'): raise ValueError('Missing\
+        \ IMPORT_PAT repository secret')\n    checkout = Path.cwd()\n    # Checkout persists no credentials. Git\
+        \ obtains the short-lived import PAT\n    # from an askpass helper, never from a remote URL or logged command.\n\
+        \    root = Path(tempfile.mkdtemp(prefix='insignificantia-import-', dir=os.environ['RUNNER_TEMP']))\n  \
+        \  ask = root / 'askpass.sh'\n    ask.write_text('#!/bin/sh\\ncase \"$1\" in *Username*) printf \"%s\\\\\
+        n\" \"x-access-token\" ;; *) printf \"%s\\\\n\" \"$IMPORT_PAT\" ;; esac\\n')\n    ask.chmod(0o700)\n   \
+        \ env = dict(os.environ, GIT_ASKPASS=str(ask), GIT_TERMINAL_PROMPT='0')\n    expected = os.environ['GITHUB_SHA']\n\
+        \    current = git(['ls-remote', 'origin', 'refs/heads/main'], checkout, env).split()[0]\n    if current\
+        \ != expected: raise ValueError('main changed after this run was scheduled; start a new run')\n    imported\
+        \ = root / 'source'\n    imported.mkdir()\n    manifest, files = check_package(checkout / 'Insignificantia-personal-site-source.zip',\
+        \ imported)\n    if any(n in files for n in ['index.html', 'about.html', '.pages.yml']):\n        raise\
+        \ ValueError('Old target site unexpectedly present in package')\n    git(['cat-file', '-e', ORIGINAL + '^{commit}'],\
+        \ checkout, env)\n    if mode == 'import':\n        git(['merge-base', '--is-ancestor', ORIGINAL, expected],\
+        \ checkout, env)\n    git(['init', '-b', 'main'], imported)\n    git(['config', 'user.name', 'Insignificantia\
+        \ migration'], imported)\n    git(['config', 'user.email', '1314212+takedaiori@users.noreply.github.com'],\
+        \ imported)\n    # -f ensures every reviewed file, including generated type declarations,\n    # is preserved\
+        \ even if the package's gitignore would normally omit it.\n    git(['add', '-f', '--all'], imported)\n \
+        \   tree = git(['write-tree'], imported)\n    git(['commit', '-m', 'Import reviewed Insignificantia production\
+        \ snapshot\\n\\nSource: ' + SOURCE + '\\nPackage SHA256: ' + ZIP_SHA], imported)\n    new = git(['rev-parse',\
+        \ 'HEAD'], imported)\n    report = {'mode': mode, 'target': TARGET, 'source_commit': SOURCE,\n        'package_sha256':\
+        \ ZIP_SHA, 'files': len(files), 'expected_target_sha': expected,\n        'original_target_sha': ORIGINAL,\
+        \ 'prepared_tree_sha': tree,\n        'prepared_commit_sha': new, 'status': 'INSPECT_PASS',\n        'note':\
+        \ 'No Pages deployment or Cloudflare changes are performed.'}\n    report_path = checkout / 'import-inspection-report.json'\n\
+        \    report_path.write_text(json.dumps(report, indent=2))\n    if mode == 'import':\n        run = os.environ['GITHUB_RUN_ID']\n\
+        \        backup_original = 'pre-insignificantia-original-' + run\n        backup_staging = 'pre-insignificantia-staging-'\
+        \ + run\n        # Two backup refs: original old site and current upload/setup state.\n        git(['push',\
+        \ 'origin', ORIGINAL + ':refs/heads/' + backup_original], checkout, env)\n        git(['push', 'origin',\
+        \ expected + ':refs/heads/' + backup_staging], checkout, env)\n        for branch, sha in [(backup_original,\
+        \ ORIGINAL), (backup_staging, expected)]:\n            got = git(['ls-remote', 'origin', 'refs/heads/' +\
+        \ branch], checkout, env).split()[0]\n            if got != sha: raise ValueError('Backup verification failed')\n\
+        \        report.update(original_backup=backup_original, staging_backup=backup_staging, status='BACKUPS_VERIFIED')\n\
+        \        report_path.write_text(json.dumps(report, indent=2))\n        git(['remote', 'add', 'origin', 'https://github.com/'\
+        \ + TARGET + '.git'], imported)\n        git(['push', '--force-with-lease=refs/heads/main:' + expected,\
+        \ 'origin', 'HEAD:refs/heads/main'], imported, env)\n        remote = git(['ls-remote', 'origin', 'refs/heads/main'],\
+        \ imported, env).split()[0]\n        if remote != new: raise ValueError('Post-import main verification failed')\n\
+        \        git(['fetch', '--depth=1', 'origin', new], imported, env)\n        remote_tree = git(['rev-parse',\
+        \ 'FETCH_HEAD^{tree}'], imported, env)\n        if remote_tree != tree: raise ValueError('Post-import source\
+        \ tree mismatch')\n        report.update(status='IMPORT_PASS', verified_target_sha=new, verified_tree_sha=remote_tree)\n\
+        \        report_path.write_text(json.dumps(report, indent=2))\n    print(json.dumps(report, indent=2))\n\
+        \    summary = os.environ.get('GITHUB_STEP_SUMMARY')\n    if summary:\n        with open(summary,'a') as\
+        \ f:\n            f.write('## Insignificantia migration\\n\\n```json\\n' + json.dumps(report, indent=2)\
+        \ + '\\n```\\n')\n            if mode == 'import':\n                f.write('\\nSource imported. Configure/confirm\
+        \ NOTION_PAGE_ID and Pages Source=GitHub Actions, then run deploy-pages.yml manually.\\n')\n\nif __name__\
+        \ == '__main__':\n    try: main()\n    except (ValueError, KeyError, FileNotFoundError, zipfile.BadZipFile)\
+        \ as e:\n        print('STOP:', str(e)); sys.exit(1)\n    except subprocess.CalledProcessError:\n      \
+        \  # Do not echo command/environment details that could carry credentials.\n        print('STOP: Git operation\
+        \ failed. Check import PAT Contents/Workflows permissions, branch rules, and concurrent main changes. Backups\
+        \ are retained.');sys.exit(1)\n\nPYIMPORT\n"
+    - name: Save migration inspection report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: insignificantia-import-report
+        path: import-inspection-report.json
+        if-no-files-found: warn
+        retention-days: 30
