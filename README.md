@@ -6,6 +6,9 @@
 
 [阅读文章](https://takedaiori.github.io/page/1) · [文章归档](https://takedaiori.github.io/archive) · [关于我与游戏摄影](https://takedaiori.github.io/about) · [RSS 订阅](https://takedaiori.github.io/rss/feed.xml)
 
+> **建站与维护文档：[NotionNext + GitHub Pages 通用开发指南（V0.5）](./NotionNext-GitHub-Pages-Guide.md)**  
+> 从 Notion 内容后台、自定义主题到静态发布、自动部署与日常维护，整理这座博客已经走通的搭建方法。
+
 ## 这里写什么
 
 游戏、科技，以及它们与日常生活发生联系的地方。
