@@ -85,6 +85,16 @@ export const IntegrationOverrides = () => {
         color: #ed8eac !important;
       }
 
+      /* Scope Notion's default ink to this dark article theme. Lists, nested
+       * lists, to-dos, toggles and table cells otherwise inherit black from
+       * the renderer. Keep explicit link, quote, callout and code colors. */
+      #theme-insignificantia .ins-notion-content,
+      #theme-insignificantia .ins-notion-content .notion {
+        --fg-color: var(--ins-text) !important;
+        --fg-color-4: var(--ins-text);
+        color: var(--ins-text);
+      }
+
       /* 6) Quote: simple cream rule, no box */
       #theme-insignificantia .ins-notion-content blockquote,
       #theme-insignificantia .ins-notion-content .notion-quote,
