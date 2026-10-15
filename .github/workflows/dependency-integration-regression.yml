@@ -49,8 +49,6 @@ jobs:
           "$RUNNER_TEMP/visual/node_modules/.bin/playwright" install --with-deps chromium
       - name: Compare pages and styles on desktop and mobile
         run: |
-          python3 -m http.server 4173 --directory "$RUNNER_TEMP/baseline/out" > /dev/null 2>&1 &
-          python3 -m http.server 4174 --directory out > /dev/null 2>&1 &
           NODE_PATH="$RUNNER_TEMP/visual/node_modules" node scripts/dependency-regression.cjs
       - name: Upload comparison evidence
         if: always()

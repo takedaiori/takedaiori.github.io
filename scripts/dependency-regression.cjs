@@ -3,6 +3,21 @@ const fs = require('fs')
 const assert = require('assert/strict')
 ;(async () => {
   fs.mkdirSync('regression-evidence', { recursive: true })
+  const http = require('http'), path = require('path')
+  const servers = []
+  for (const [port, root] of [[4173, path.join(process.env.RUNNER_TEMP, 'baseline/out')], [4174, path.resolve('out')]]) {
+    const server = http.createServer((req,res) => {
+      const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname)
+      const target = path.resolve(root, '.' + pathname)
+      if (!target.startsWith(root + path.sep) && target !== root) {res.writeHead(403);return res.end()}
+      const file = [target, target + '.html', path.join(target, 'index.html')].find(f => {try{return fs.statSync(f).isFile()}catch{return false}})
+      if (!file) {res.writeHead(404);return res.end('Not found')}
+      const mime = {'.html':'text/html','.js':'application/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.woff2':'font/woff2'}
+      res.setHeader('Content-Type', mime[path.extname(file)] || 'application/octet-stream')
+      fs.createReadStream(file).pipe(res)
+    })
+    await new Promise(resolve => server.listen(port, resolve)); servers.push(server)
+  }
   const browser = await chromium.launch()
   const results = []
   for (const width of [1440, 390]) {
@@ -40,4 +55,5 @@ const assert = require('assert/strict')
     }
   }
   await browser.close()
+  for (const server of servers) server.close()
 })().catch(e=>{console.error(e);process.exit(1)})
