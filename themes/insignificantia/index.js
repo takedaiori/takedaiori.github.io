@@ -66,9 +66,18 @@ const LayoutBase = props => {
 
 const LayoutIndex = props => <HomePage {...props} />
 
-const LayoutPostList = props => (
-  <ArticleListPage {...props} />
-)
+const LayoutPostList = props => {
+  const router = useRouter()
+  const isFilteredList =
+    props.category != null ||
+    props.tag != null ||
+    router.pathname.startsWith('/category/') ||
+    router.pathname.startsWith('/tag/')
+
+  return isFilteredList
+    ? <ArchiveResultPage {...props} />
+    : <ArticleListPage {...props} />
+}
 
 const LayoutArchive = props => (
   <ArchivePage {...props} />

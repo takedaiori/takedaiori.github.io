@@ -4,21 +4,20 @@ import ArticleListPage from './ArticleListPage'
 const ArchiveResultPage = props => {
   const router = useRouter()
 
-  const filterValue =
-    router?.query?.category ||
-    router?.query?.tag ||
-    ''
-
-  const label = Array.isArray(filterValue)
-    ? filterValue[0]
-    : decodeURIComponent(String(filterValue || ''))
-
   const isCategory =
-    router?.pathname?.includes('/category/')
+    props.category != null ||
+    router.pathname.startsWith('/category/')
 
-  const base = isCategory
-    ? `/category/${encodeURIComponent(label)}/page`
-    : `/tag/${encodeURIComponent(label)}/page`
+  // Static props remain available before the router query is hydrated.
+  // Next.js already decodes route parameters; do not decode them again.
+  const filterValue = isCategory
+    ? (props.category ?? router.query.category)
+    : (props.tag ?? router.query.tag)
+
+  const label = String(
+    (Array.isArray(filterValue) ? filterValue[0] : filterValue) ?? ''
+  )
+  const base = `/${isCategory ? 'category' : 'tag'}/${encodeURIComponent(label)}`
 
   return (
     <ArticleListPage
@@ -27,7 +26,7 @@ const ArchiveResultPage = props => {
       contextLabel={isCategory ? 'CATEGORY' : 'TAG'}
       contextValue={label}
       makePageHref={pageNumber =>
-        `${base}/${pageNumber}`
+        pageNumber === 1 ? base : `${base}/page/${pageNumber}`
       }
     />
   )
