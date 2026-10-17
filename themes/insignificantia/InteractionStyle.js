@@ -72,6 +72,79 @@ export const InteractionStyle = () => (
     .ins-reading-toc-panel::-webkit-scrollbar-thumb:hover { background: var(--ins-pink); }
     .ins-reading-toc-panel::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
     .ins-reading-toc-panel::-webkit-scrollbar-corner { background: var(--ins-bg); }
+    /* The transparent dock stays available to mouse and keyboard, not visible. */
+    .ins-reading-toc {
+      height: 18vh;
+      height: 18dvh;
+      max-height: 18vh;
+      max-height: 18dvh;
+    }
+    .ins-reading-toc .ins-reading-toc-trigger {
+      height: 100%;
+      max-height: 100%;
+      padding: 0 12px;
+      background: transparent;
+    }
+    .ins-reading-toc .ins-reading-toc-marks {
+      position: relative;
+      height: 100%;
+      max-height: 100%;
+      width: 20px;
+      gap: 0;
+      overflow: visible;
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+    .ins-reading-toc[data-open="true"] .ins-reading-toc-marks { opacity: 1; transform: none; }
+    .ins-reading-toc .ins-reading-toc-marks::before {
+      content: "";
+      position: absolute;
+      top: 0; bottom: 0; left: 8px;
+      width: 4px;
+      border-radius: 999px;
+      background: var(--ins-muted);
+      pointer-events: none;
+    }
+    .ins-reading-toc .ins-reading-toc-mark {
+      position: relative;
+      z-index: 1;
+      flex: 1 1 0;
+      height: auto;
+      min-height: 0;
+      max-height: none;
+    }
+    .ins-reading-toc .ins-reading-toc-mark > span,
+    .ins-reading-toc .ins-reading-toc-trigger:hover .ins-reading-toc-mark > span {
+      width: 4px;
+      border-radius: 0;
+      background: transparent;
+      transform: none;
+      transition: background-color 140ms ease;
+    }
+    .ins-reading-toc .ins-reading-toc-trigger .ins-reading-toc-mark[data-highlighted="true"] > span {
+      width: 6px;
+      min-height: 2px;
+      background: var(--ins-pink);
+      transform: none;
+    }
+    .ins-reading-toc .ins-reading-toc-panel {
+      height: auto;
+      max-height: 100%;
+      animation: none;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translate(-8px, -50%);
+      transition: opacity 180ms ease, transform 180ms ease, visibility 0s linear 180ms;
+    }
+    .ins-reading-toc[data-open="true"] .ins-reading-toc-panel {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translate(0, -50%);
+      transition-delay: 0s;
+    }
     /* Keyframes make direction changes atomic, including the wrap from 1 to 3. */
     .ins-carousel[data-direction="next"] .ins-slide.active { animation: ins-slide-from-right 720ms cubic-bezier(0.22, 1, 0.36, 1) both; }
     .ins-carousel[data-direction="next"] .ins-slide.is-leaving { animation: ins-slide-to-left 720ms ease both; }
@@ -105,6 +178,9 @@ export const InteractionStyle = () => (
       .ins-carousel .ins-carousel-arrow,
       .ins-carousel .ins-carousel-arrow svg { transition: none; }
       .ins-carousel .ins-slide.active, .ins-carousel .ins-slide.is-leaving { animation: none !important; }
+      .ins-reading-toc .ins-reading-toc-marks,
+      .ins-reading-toc .ins-reading-toc-panel,
+      .ins-reading-toc .ins-reading-toc-mark > span { transition: none; }
       .ins-image-loading::after { animation: none; border-style: dotted; }
     }
   `}</style>

@@ -16,13 +16,13 @@ export const findTocTarget = (root, id) => {
 const ArticleToc = ({ items, articleRef, postId }) => {
   const [mounted, setMounted] = useState(false)
   const [open, setOpen] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(null)
   const dockRef = useRef(null)
   const triggerRef = useRef(null)
-  const pinnedRef = useRef(false)
 
   useEffect(() => { setMounted(true) }, [])
   useEffect(() => {
-    pinnedRef.current = false
+    setActiveIndex(null)
     setOpen(false)
   }, [postId])
 
@@ -30,14 +30,14 @@ const ArticleToc = ({ items, articleRef, postId }) => {
     if (!open) return
     const closeOutside = event => {
       if (!dockRef.current?.contains(event.target)) {
-        pinnedRef.current = false
+        setActiveIndex(null)
         setOpen(false)
       }
     }
     const closeEscape = event => {
       if (event.key === 'Escape') {
         if (dockRef.current?.contains(document.activeElement)) triggerRef.current?.focus()
-        pinnedRef.current = false
+        setActiveIndex(null)
         setOpen(false)
       }
     }
@@ -54,7 +54,6 @@ const ArticleToc = ({ items, articleRef, postId }) => {
 
   const jumpTo = (event, item) => {
     if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
-    pinnedRef.current = true
     setOpen(true)
     const id = item.id || item.blockId || item.uuid
     const root = articleRef.current
@@ -84,10 +83,10 @@ const ArticleToc = ({ items, articleRef, postId }) => {
         if (event.pointerType === 'mouse') setOpen(true)
       }}
       onPointerLeave={event => {
-        if (event.pointerType === 'mouse' && !pinnedRef.current && !dockRef.current?.contains(document.activeElement)) setOpen(false)
+        if (event.pointerType === 'mouse') { setOpen(false); setActiveIndex(null) }
       }}
       onBlur={event => {
-        if (!pinnedRef.current && !event.currentTarget.contains(event.relatedTarget)) setOpen(false)
+        if (!event.currentTarget.contains(event.relatedTarget)) { setOpen(false); setActiveIndex(null) }
       }}>
       <div className='ins-reading-toc-trigger'>
         <div className='ins-reading-toc-marks'>
@@ -103,7 +102,10 @@ const ArticleToc = ({ items, articleRef, postId }) => {
                 aria-label={'跳转至：' + title}
                 aria-expanded={open}
                 aria-controls='ins-reading-toc-list'
-                onFocus={() => setOpen(true)}
+                data-highlighted={activeIndex === index}
+                onMouseEnter={() => setActiveIndex(index)}
+                onMouseLeave={() => setActiveIndex(null)}
+                onFocus={() => { setOpen(true); setActiveIndex(index) }}
                 onClick={event => jumpTo(event, item)}>
                 <span aria-hidden='true' />
               </a>
@@ -111,8 +113,7 @@ const ArticleToc = ({ items, articleRef, postId }) => {
           })}
         </div>
       </div>
-      {open && (
-        <nav id='ins-reading-toc-list' className='ins-reading-toc-panel' aria-label='文章目录'>
+      <nav id='ins-reading-toc-list' className='ins-reading-toc-panel' aria-label='文章目录' aria-hidden={!open} inert={!open ? '' : undefined}>
           {entries.map((item, index) => {
             const id = item.id || item.blockId || item.uuid || ''
             return (
@@ -120,13 +121,15 @@ const ArticleToc = ({ items, articleRef, postId }) => {
                 key={id || index}
                 href={id ? '#' + normalizeId(id) : '#'}
                 className={Number(item.indentLevel ?? item.level ?? 0) > 0 ? 'is-sub' : ''}
+                onMouseEnter={() => setActiveIndex(index)}
+                onMouseLeave={() => setActiveIndex(null)}
+                onFocus={() => { setOpen(true); setActiveIndex(index) }}
                 onClick={event => jumpTo(event, item)}>
                 {item.text || item.title || item.value}
               </a>
             )
           })}
-        </nav>
-      )}
+      </nav>
     </aside>,
     document.body
   )

@@ -46,7 +46,7 @@ it('mounts outside the page and closes on an outside press without disabling the
   outside.remove()
 })
 
-it('scrolls to the rendered heading and keeps the drawer open', () => {
+it('scrolls to the rendered heading and closes after focus leaves', () => {
   root.firstChild.scrollIntoView = jest.fn()
   const { unmount } = mount()
   fireEvent.focus(screen.getByRole('link', { name: '跳转至：First heading' }))
@@ -54,7 +54,7 @@ it('scrolls to the rendered heading and keeps the drawer open', () => {
   expect(root.firstChild.scrollIntoView).toHaveBeenCalledWith({ block: 'start', behavior: 'smooth' })
   expect(window.location.hash).toBe('#' + compactId)
   fireEvent.blur(screen.getByRole('link', { name: 'First heading' }), { relatedTarget: document.body })
-  expect(screen.getByRole('navigation', { name: '文章目录' })).toBeInTheDocument()
+  expect(screen.queryByRole('navigation', { name: '文章目录' })).toBeNull()
   unmount()
 })
 
@@ -91,7 +91,7 @@ it('updates marks when heading count changes and omits empty headings', () => {
   unmount()
 })
 
-it('makes every mark navigate to its own heading and keeps the menu open after leaving', () => {
+it('makes every mark navigate to its own heading and hides after the mouse leaves', () => {
   const second = document.createElement('h3')
   second.id = 'second'
   second.textContent = 'Second heading'
@@ -109,12 +109,40 @@ it('makes every mark navigate to its own heading and keeps the menu open after l
   Object.defineProperty(leave, 'pointerType', { value: 'mouse' })
   Object.defineProperty(leave, 'relatedTarget', { value: document.body })
   fireEvent(document.querySelector('.ins-reading-toc'), leave)
-  expect(screen.getByRole('navigation', { name: '文章目录' })).toBeInTheDocument()
+  expect(screen.queryByRole('navigation', { name: '文章目录' })).toBeNull()
   fireEvent.click(screen.getByRole('link', { name: '跳转至：First heading' }))
   expect(root.firstChild.scrollIntoView).toHaveBeenCalledTimes(1)
   expect(window.location.hash).toBe('#' + compactId)
   expect(screen.getByRole('navigation', { name: '文章目录' })).toBeInTheDocument()
   fireEvent.pointerDown(document.body)
   expect(screen.queryByRole('navigation', { name: '文章目录' })).toBeNull()
+  unmount()
+})
+
+
+it('starts hidden, reveals on mouse entry and highlights just the hovered chapter in a long TOC', () => {
+  const headings = Array.from({ length: 120 }, (_, index) => ({ id: 'h-' + index, text: 'Section ' + index }))
+  const { unmount } = render(<ArticleToc items={headings} articleRef={{ current: root }} postId='long-post' />)
+  const dock = document.querySelector('.ins-reading-toc')
+  expect(dock.dataset.open).toBe('false')
+  expect(screen.queryByRole('navigation', { name: '文章目录' })).toBeNull()
+  const enter = new Event('pointerover', { bubbles: true })
+  Object.defineProperty(enter, 'pointerType', { value: 'mouse' })
+  Object.defineProperty(enter, 'relatedTarget', { value: document.body })
+  fireEvent(dock, enter)
+  expect(dock.dataset.open).toBe('true')
+  expect(screen.getByRole('navigation', { name: '文章目录' })).toBeInTheDocument()
+  fireEvent.mouseEnter(screen.getByRole('link', { name: 'Section 77', exact: true }))
+  expect(document.querySelectorAll('.ins-reading-toc-mark[data-highlighted="true"]')).toHaveLength(1)
+  expect(document.querySelectorAll('.ins-reading-toc-mark')[77].dataset.highlighted).toBe('true')
+  fireEvent.mouseEnter(screen.getByRole('link', { name: 'Section 12', exact: true }))
+  expect(document.querySelectorAll('.ins-reading-toc-mark[data-highlighted="true"]')).toHaveLength(1)
+  expect(document.querySelectorAll('.ins-reading-toc-mark')[12].dataset.highlighted).toBe('true')
+  const leave = new Event('pointerout', { bubbles: true })
+  Object.defineProperty(leave, 'pointerType', { value: 'mouse' })
+  Object.defineProperty(leave, 'relatedTarget', { value: document.body })
+  fireEvent(dock, leave)
+  expect(dock.dataset.open).toBe('false')
+  expect(document.querySelectorAll('.ins-reading-toc-mark[data-highlighted="true"]')).toHaveLength(0)
   unmount()
 })
