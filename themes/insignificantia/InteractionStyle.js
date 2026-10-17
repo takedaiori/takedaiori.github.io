@@ -74,10 +74,10 @@ export const InteractionStyle = () => (
     .ins-reading-toc-panel::-webkit-scrollbar-corner { background: var(--ins-bg); }
     /* The transparent dock stays available to mouse and keyboard, not visible. */
     .ins-reading-toc {
-      height: 18vh;
-      height: 18dvh;
-      max-height: 18vh;
-      max-height: 18dvh;
+      height: 28vh;
+      height: 28dvh;
+      max-height: 28vh;
+      max-height: 28dvh;
     }
     .ins-reading-toc .ins-reading-toc-trigger {
       height: 100%;
@@ -115,22 +115,19 @@ export const InteractionStyle = () => (
       max-height: none;
     }
     .ins-reading-toc .ins-reading-toc-mark > span,
-    .ins-reading-toc .ins-reading-toc-trigger:hover .ins-reading-toc-mark > span {
+    .ins-reading-toc .ins-reading-toc-trigger:hover .ins-reading-toc-mark > span,
+    .ins-reading-toc .ins-reading-toc-trigger .ins-reading-toc-mark:hover > span,
+    .ins-reading-toc .ins-reading-toc-trigger .ins-reading-toc-mark:focus-visible > span {
       width: 4px;
       border-radius: 0;
       background: transparent;
       transform: none;
       transition: background-color 140ms ease;
     }
-    .ins-reading-toc .ins-reading-toc-trigger .ins-reading-toc-mark[data-highlighted="true"] > span {
-      width: 6px;
-      min-height: 2px;
-      background: var(--ins-pink);
-      transform: none;
-    }
     .ins-reading-toc .ins-reading-toc-panel {
       height: auto;
-      max-height: 100%;
+      max-height: 35vh;
+      max-height: 35dvh;
       animation: none;
       opacity: 0;
       visibility: hidden;

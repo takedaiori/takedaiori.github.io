@@ -16,13 +16,11 @@ export const findTocTarget = (root, id) => {
 const ArticleToc = ({ items, articleRef, postId }) => {
   const [mounted, setMounted] = useState(false)
   const [open, setOpen] = useState(false)
-  const [activeIndex, setActiveIndex] = useState(null)
   const dockRef = useRef(null)
   const triggerRef = useRef(null)
 
   useEffect(() => { setMounted(true) }, [])
   useEffect(() => {
-    setActiveIndex(null)
     setOpen(false)
   }, [postId])
 
@@ -30,14 +28,12 @@ const ArticleToc = ({ items, articleRef, postId }) => {
     if (!open) return
     const closeOutside = event => {
       if (!dockRef.current?.contains(event.target)) {
-        setActiveIndex(null)
         setOpen(false)
       }
     }
     const closeEscape = event => {
       if (event.key === 'Escape') {
         if (dockRef.current?.contains(document.activeElement)) triggerRef.current?.focus()
-        setActiveIndex(null)
         setOpen(false)
       }
     }
@@ -83,10 +79,10 @@ const ArticleToc = ({ items, articleRef, postId }) => {
         if (event.pointerType === 'mouse') setOpen(true)
       }}
       onPointerLeave={event => {
-        if (event.pointerType === 'mouse') { setOpen(false); setActiveIndex(null) }
+        if (event.pointerType === 'mouse') { setOpen(false) }
       }}
       onBlur={event => {
-        if (!event.currentTarget.contains(event.relatedTarget)) { setOpen(false); setActiveIndex(null) }
+        if (!event.currentTarget.contains(event.relatedTarget)) { setOpen(false) }
       }}>
       <div className='ins-reading-toc-trigger'>
         <div className='ins-reading-toc-marks'>
@@ -102,10 +98,7 @@ const ArticleToc = ({ items, articleRef, postId }) => {
                 aria-label={'跳转至：' + title}
                 aria-expanded={open}
                 aria-controls='ins-reading-toc-list'
-                data-highlighted={activeIndex === index}
-                onMouseEnter={() => setActiveIndex(index)}
-                onMouseLeave={() => setActiveIndex(null)}
-                onFocus={() => { setOpen(true); setActiveIndex(index) }}
+                onFocus={() => { setOpen(true) }}
                 onClick={event => jumpTo(event, item)}>
                 <span aria-hidden='true' />
               </a>
@@ -121,9 +114,7 @@ const ArticleToc = ({ items, articleRef, postId }) => {
                 key={id || index}
                 href={id ? '#' + normalizeId(id) : '#'}
                 className={Number(item.indentLevel ?? item.level ?? 0) > 0 ? 'is-sub' : ''}
-                onMouseEnter={() => setActiveIndex(index)}
-                onMouseLeave={() => setActiveIndex(null)}
-                onFocus={() => { setOpen(true); setActiveIndex(index) }}
+                onFocus={() => { setOpen(true) }}
                 onClick={event => jumpTo(event, item)}>
                 {item.text || item.title || item.value}
               </a>

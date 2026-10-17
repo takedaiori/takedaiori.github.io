@@ -120,7 +120,7 @@ it('makes every mark navigate to its own heading and hides after the mouse leave
 })
 
 
-it('starts hidden, reveals on mouse entry and highlights just the hovered chapter in a long TOC', () => {
+it('starts hidden, reveals on mouse entry and keeps the rail neutral while hovering chapters in a long TOC', () => {
   const headings = Array.from({ length: 120 }, (_, index) => ({ id: 'h-' + index, text: 'Section ' + index }))
   const { unmount } = render(<ArticleToc items={headings} articleRef={{ current: root }} postId='long-post' />)
   const dock = document.querySelector('.ins-reading-toc')
@@ -133,11 +133,9 @@ it('starts hidden, reveals on mouse entry and highlights just the hovered chapte
   expect(dock.dataset.open).toBe('true')
   expect(screen.getByRole('navigation', { name: '文章目录' })).toBeInTheDocument()
   fireEvent.mouseEnter(screen.getByRole('link', { name: 'Section 77', exact: true }))
-  expect(document.querySelectorAll('.ins-reading-toc-mark[data-highlighted="true"]')).toHaveLength(1)
-  expect(document.querySelectorAll('.ins-reading-toc-mark')[77].dataset.highlighted).toBe('true')
+  expect(document.querySelectorAll('.ins-reading-toc-mark[data-highlighted]')).toHaveLength(0)
   fireEvent.mouseEnter(screen.getByRole('link', { name: 'Section 12', exact: true }))
-  expect(document.querySelectorAll('.ins-reading-toc-mark[data-highlighted="true"]')).toHaveLength(1)
-  expect(document.querySelectorAll('.ins-reading-toc-mark')[12].dataset.highlighted).toBe('true')
+  expect(document.querySelectorAll('.ins-reading-toc-mark[data-highlighted]')).toHaveLength(0)
   const leave = new Event('pointerout', { bubbles: true })
   Object.defineProperty(leave, 'pointerType', { value: 'mouse' })
   Object.defineProperty(leave, 'relatedTarget', { value: document.body })
