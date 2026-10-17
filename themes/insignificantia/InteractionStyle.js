@@ -72,15 +72,21 @@ export const InteractionStyle = () => (
     .ins-reading-toc-panel::-webkit-scrollbar-thumb:hover { background: var(--ins-pink); }
     .ins-reading-toc-panel::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
     .ins-reading-toc-panel::-webkit-scrollbar-corner { background: var(--ins-bg); }
-    /* The transparent dock stays available to mouse and keyboard, not visible. */
+    /* Keep the full drawer footprint interactive even while its contents are hidden. */
     .ins-reading-toc {
-      height: 28vh;
-      height: 28dvh;
-      max-height: 28vh;
-      max-height: 28dvh;
+      width: calc(44px + min(260px, calc(50vw - 541px)));
+      height: 35vh;
+      height: 35dvh;
+      max-height: 35vh;
+      max-height: 35dvh;
     }
     .ins-reading-toc .ins-reading-toc-trigger {
-      height: 100%;
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      height: 28vh;
+      height: 28dvh;
       max-height: 100%;
       padding: 0 12px;
       background: transparent;
@@ -125,6 +131,7 @@ export const InteractionStyle = () => (
       transition: background-color 140ms ease;
     }
     .ins-reading-toc .ins-reading-toc-panel {
+      left: 44px;
       height: auto;
       max-height: 35vh;
       max-height: 35dvh;
