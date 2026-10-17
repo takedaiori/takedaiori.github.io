@@ -85,8 +85,8 @@ export const InteractionStyle = () => (
       top: 50%;
       left: 0;
       transform: translateY(-50%);
-      height: 28vh;
-      height: 28dvh;
+      height: var(--ins-toc-rail-height, 28vh);
+      height: var(--ins-toc-rail-height, 28dvh);
       max-height: 100%;
       padding: 0 12px;
       background: transparent;

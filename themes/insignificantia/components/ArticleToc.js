@@ -18,6 +18,7 @@ const ArticleToc = ({ items, articleRef, postId }) => {
   const [open, setOpen] = useState(false)
   const dockRef = useRef(null)
   const triggerRef = useRef(null)
+  const panelRef = useRef(null)
 
   useEffect(() => { setMounted(true) }, [])
   useEffect(() => {
@@ -44,6 +45,26 @@ const ArticleToc = ({ items, articleRef, postId }) => {
       document.removeEventListener('keydown', closeEscape)
     }
   }, [open])
+
+  // Measure the rendered menu, including wrapping and its viewport height cap.
+  // The outer dock remains 35dvh; only the clickable rail scales to 80% of the menu.
+  useEffect(() => {
+    const panel = panelRef.current
+    const dock = dockRef.current
+    if (!mounted || !panel || !dock) return
+    const resizeRail = () => {
+      const height = panel.getBoundingClientRect().height
+      if (height > 0) dock.style.setProperty('--ins-toc-rail-height', height * 0.8 + 'px')
+    }
+    resizeRail()
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(resizeRail) : null
+    observer?.observe(panel)
+    window.addEventListener('resize', resizeRail)
+    return () => {
+      observer?.disconnect()
+      window.removeEventListener('resize', resizeRail)
+    }
+  }, [mounted, items, postId])
 
   const entries = items.filter(item => item?.text || item?.title || item?.value)
   if (!mounted || !entries.length) return null
@@ -106,7 +127,7 @@ const ArticleToc = ({ items, articleRef, postId }) => {
           })}
         </div>
       </div>
-      <nav id='ins-reading-toc-list' className='ins-reading-toc-panel' aria-label='文章目录' aria-hidden={!open} inert={!open ? '' : undefined}>
+      <nav ref={panelRef} id='ins-reading-toc-list' className='ins-reading-toc-panel' aria-label='文章目录' aria-hidden={!open} inert={!open ? '' : undefined}>
           {entries.map((item, index) => {
             const id = item.id || item.blockId || item.uuid || ''
             return (

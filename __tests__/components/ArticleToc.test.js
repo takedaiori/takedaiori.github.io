@@ -144,3 +144,37 @@ it('starts hidden, reveals on mouse entry and keeps the rail neutral while hover
   expect(document.querySelectorAll('.ins-reading-toc-mark[data-highlighted="true"]')).toHaveLength(0)
   unmount()
 })
+
+it('scales the rail with the actual menu height and releases its resize observer', () => {
+  const originalObserver = global.ResizeObserver
+  let resize
+  const disconnect = jest.fn()
+  const observe = jest.fn()
+  global.ResizeObserver = jest.fn(callback => {
+    resize = callback
+    return { observe, disconnect }
+  })
+  let menuHeight = 100
+  const bounds = jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+    .mockImplementation(() => ({ height: menuHeight }))
+  let unmount
+  try {
+    ;({ unmount } = mount())
+    const dock = document.querySelector('.ins-reading-toc')
+    expect(dock.style.getPropertyValue('--ins-toc-rail-height')).toBe('80px')
+    expect(observe).toHaveBeenCalledWith(document.getElementById('ins-reading-toc-list'))
+    menuHeight = 280
+    resize()
+    expect(dock.style.getPropertyValue('--ins-toc-rail-height')).toBe('224px')
+    menuHeight = 60
+    resize()
+    expect(dock.style.getPropertyValue('--ins-toc-rail-height')).toBe('48px')
+    unmount()
+    unmount = null
+    expect(disconnect).toHaveBeenCalledTimes(1)
+  } finally {
+    unmount?.()
+    bounds.mockRestore()
+    global.ResizeObserver = originalObserver
+  }
+})
