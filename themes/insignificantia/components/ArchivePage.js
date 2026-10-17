@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { postYear } from '@/lib/utils/readingNavigation'
 import { useRouter } from 'next/router'
 import ArticleListPage from './ArticleListPage'
 
@@ -24,16 +25,7 @@ const normalizeOption = option => {
   }
 }
 
-const extractYear = post => {
-  const value =
-    post?.publishDay ||
-    post?.date ||
-    post?.createdTime ||
-    ''
-
-  const match = String(value).match(/(19|20)\d{2}/)
-  return match ? match[0] : ''
-}
+const extractYear = postYear
 
 const categorySort = (a, b) => {
   const left = normalizeOption(a).name

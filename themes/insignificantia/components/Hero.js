@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import CONFIG from '../config'
 
 const SLIDES = [
@@ -21,33 +21,46 @@ const SLIDES = [
 ]
 
 const Hero = () => {
-  const [current, setCurrent] = useState(0)
-  const [previous, setPrevious] = useState(null)
+  const [slideState, setSlideState] = useState({ current: 0, previous: null, direction: 'next' })
+  const { current, previous, direction } = slideState
+  const touch = useRef(null)
 
-  const show = index => {
-    const next = (index + SLIDES.length) % SLIDES.length
-    if (next === current) return
-    setPrevious(current)
-    setCurrent(next)
+  const show = (index, requestedDirection) => {
+    setSlideState(state => {
+      const target = (index + SLIDES.length) % SLIDES.length
+      if (target === state.current) return state
+      return { current: target, previous: state.current, direction: requestedDirection || (target > state.current ? 'next' : 'prev') }
+    })
   }
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setCurrent(value => {
-        setPrevious(value)
-        return (value + 1) % SLIDES.length
-      })
+      // Do not rotate underneath a finger during a gesture.
+      if (touch.current) return
+      setSlideState(state => ({ current: (state.current + 1) % SLIDES.length, previous: state.current, direction: 'next' }))
     }, 7000)
     return () => window.clearInterval(timer)
   }, [])
 
   useEffect(() => {
     if (previous === null) return undefined
-    const timer = window.setTimeout(() => {
-      setPrevious(null)
-    }, 780)
+    const timer = window.setTimeout(() => setSlideState(state => ({ ...state, previous: null })), 780)
     return () => window.clearTimeout(timer)
   }, [current, previous])
+
+  const startTouch = event => {
+    if (event.touches.length !== 1 || event.target.closest('button')) return
+    touch.current = { x: event.touches[0].clientX, y: event.touches[0].clientY }
+  }
+  const endTouch = event => {
+    const start = touch.current
+    touch.current = null
+    if (!start || !event.changedTouches[0]) return
+    const dx = event.changedTouches[0].clientX - start.x
+    const dy = event.changedTouches[0].clientY - start.y
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.3) return
+    show(current + (dx < 0 ? 1 : -1), dx < 0 ? 'next' : 'prev')
+  }
 
   return (
     <section className='ins-hero'>
@@ -71,6 +84,10 @@ const Hero = () => {
         <div className='ins-hero-visual'>
           <div
             className='ins-carousel'
+            data-direction={direction}
+            onTouchStart={startTouch}
+            onTouchEnd={endTouch}
+            onTouchCancel={() => { touch.current = null }}
             aria-label='视觉作品轮播'
             style={{ aspectRatio: '1 / 1' }}>
             <div className='ins-carousel-track'>
@@ -87,6 +104,7 @@ const Hero = () => {
                       src={slide.src}
                       alt={`Hero visual ${index + 1}`}
                       decoding='async'
+                      draggable={false}
                       style={{
                         width: '100%',
                         height: '100%',
@@ -104,14 +122,14 @@ const Hero = () => {
               className='ins-carousel-arrow prev'
               type='button'
               aria-label='上一张'
-              onClick={() => show(current - 1)}>
+              onClick={() => show(current - 1, 'prev')}>
               ‹
             </button>
             <button
               className='ins-carousel-arrow next'
               type='button'
               aria-label='下一张'
-              onClick={() => show(current + 1)}>
+              onClick={() => show(current + 1, 'next')}>
               ›
             </button>
 

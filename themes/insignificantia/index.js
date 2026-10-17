@@ -6,8 +6,10 @@ import { ArticleDetailStyle } from './ArticleDetailStyle'
 import { AboutStyle } from './AboutStyle'
 import { IntegrationOverrides } from './IntegrationOverrides'
 import { MotionStyle } from './MotionStyle'
+import { InteractionStyle } from './InteractionStyle'
 import CONFIG from './config'
 import SiteHeader from './components/SiteHeader'
+import ImageLoading from './components/ImageLoading'
 import SiteFooter from './components/SiteFooter'
 import HomePage from './components/HomePage'
 import ArticleListPage from './components/ArticleListPage'
@@ -55,7 +57,9 @@ const LayoutBase = props => {
       <AboutStyle />
       <IntegrationOverrides />
       <MotionStyle />
+      <InteractionStyle />
       <SiteHeader />
+      <ImageLoading />
       <PageEntrance disabled={isArticleDetail}>
         <div className='ins-page-shell'>{props.children}</div>
         <SiteFooter />

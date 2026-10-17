@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { useRef } from 'react'
+import { useRouter } from 'next/router'
+import { readingHref, selectReadingNavigation } from '@/lib/utils/readingNavigation'
 import ArticleToc from './ArticleToc'
 import NotionPage from '@/components/NotionPage'
 
@@ -20,9 +22,15 @@ const ArticleDetailPage = ({
   post,
   prev,
   next,
+  readingNavigation,
   toc: tocProp
 }) => {
   const articleRef = useRef(null)
+  const router = useRouter()
+  const navigation = selectReadingNavigation(readingNavigation, router.query)
+  // Legacy props are only a fallback for pages built before navigation metadata.
+  const newer = readingNavigation ? navigation.newer : prev
+  const older = readingNavigation ? navigation.older : next
 
   if (!post) {
     return (
@@ -94,27 +102,25 @@ const ArticleDetailPage = ({
               </div>
             )}
 
-            {(prev || next) && (
-              <nav
-                className='ins-post-nav'
-                aria-label='上一篇与下一篇'>
-                {prev ? (
-                  <Link href={getHref(prev)}>
-                    <span>上一篇</span>
-                    <strong>{prev.title}</strong>
-                  </Link>
-                ) : (
-                  <div />
-                )}
-
-                {next ? (
-                  <Link href={getHref(next)}>
+            {navigation.type !== 'all' && (
+              <div className='ins-reading-context ins-page-kicker'>
+                {navigation.type.toUpperCase()} · {navigation.value}
+              </div>
+            )}
+            {(newer || older) && (
+              <nav className='ins-post-nav' aria-label='上一篇与下一篇'>
+                {newer ? (
+                  <Link href={readingHref(getHref(newer), navigation)}>
                     <span>下一篇</span>
-                    <strong>{next.title}</strong>
+                    <strong>{newer.title}</strong>
                   </Link>
-                ) : (
-                  <div />
-                )}
+                ) : <div />}
+                {older ? (
+                  <Link href={readingHref(getHref(older), navigation)}>
+                    <span>上一篇</span>
+                    <strong>{older.title}</strong>
+                  </Link>
+                ) : <div />}
               </nav>
             )}
           </footer>

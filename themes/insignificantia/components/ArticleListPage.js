@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { readingHref } from '@/lib/utils/readingNavigation'
 import { useRouter } from 'next/router'
 
 const PAGE_SIZE = 15
@@ -81,6 +82,9 @@ const ArticleListPage = ({
   makePageHref
 }) => {
   const router = useRouter()
+  const readingContext = contextValue && ['YEAR', 'TAG', 'CATEGORY'].includes(contextLabel)
+    ? { type: contextLabel.toLowerCase(), value: contextValue }
+    : null
 
   const currentPage = safeNumber(
     router?.query?.page ||
@@ -181,7 +185,7 @@ const ArticleListPage = ({
               post.slug ||
               `${post.title}-${index}`
             }
-            href={getHref(post)}
+            href={readingHref(getHref(post), readingContext)}
             className='ins-article-list-card'
             aria-label={`阅读：${
               post?.title || 'Untitled'

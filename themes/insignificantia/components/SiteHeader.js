@@ -4,8 +4,32 @@ import CONFIG from '../config'
 
 const SiteHeader = () => {
   const [open, setOpen] = useState(false)
+  const [hidden, setHidden] = useState(false)
   const headerRef = useRef(null)
   const toggleRef = useRef(null)
+
+  useEffect(() => {
+    let lastY = Math.max(0, window.scrollY)
+    let accumulated = 0
+    let frame = 0
+    const update = () => {
+      frame = 0
+      const y = Math.max(0, Math.min(window.scrollY, document.documentElement.scrollHeight - window.innerHeight))
+      const delta = y - lastY
+      lastY = y
+      if (y <= 12) { accumulated = 0; setHidden(false); return }
+      accumulated = Math.sign(delta) === Math.sign(accumulated) ? accumulated + delta : delta
+      if (Math.abs(accumulated) >= 8) {
+        const hide = accumulated > 0
+        setHidden(hide)
+        if (hide) setOpen(false)
+        accumulated = 0
+      }
+    }
+    const onScroll = () => { if (!frame) frame = window.requestAnimationFrame(update) }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => { window.removeEventListener('scroll', onScroll); window.cancelAnimationFrame(frame) }
+  }, [])
 
   useEffect(() => {
     if (!open) return
@@ -27,7 +51,7 @@ const SiteHeader = () => {
   }, [open])
 
   return (
-    <header ref={headerRef} className='ins-site-header'>
+    <header ref={headerRef} className='ins-site-header' data-hidden={hidden} inert={hidden ? '' : undefined} aria-hidden={hidden || undefined} onFocusCapture={() => setHidden(false)}>
       <div className='ins-nav-inner'>
         <Link className='ins-brand' href='/' aria-label='Insignificantia. Home'>
           {CONFIG.INSIGNIFICANTIA_SITE_NAME}
