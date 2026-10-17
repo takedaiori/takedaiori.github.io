@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { paginationItems } from '@/lib/utils/pagination'
 import { readingHref } from '@/lib/utils/readingNavigation'
 import { useRouter } from 'next/router'
 
@@ -225,10 +226,18 @@ const ArticleListPage = ({
         <nav
           className='ins-pagination'
           aria-label='文章分页'>
-          {Array.from(
-            { length: totalPages },
-            (_, index) => {
-              const pageNumber = index + 1
+          {paginationItems(totalPages, currentPage).map(pageNumber => {
+              if (typeof pageNumber !== 'number') {
+                return (
+                  <span
+                    key={pageNumber}
+                    className='ins-pagination-ellipsis'
+                    aria-hidden='true'
+                    style={{ display: 'inline-flex', alignItems: 'center', padding: '0 6px', color: 'var(--ins-muted)' }}>
+                    ……
+                  </span>
+                )
+              }
 
               return (
                 <Link
