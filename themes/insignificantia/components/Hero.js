@@ -24,6 +24,8 @@ const Hero = () => {
   const [slideState, setSlideState] = useState({ current: 0, previous: null, direction: 'next' })
   const { current, previous, direction } = slideState
   const touch = useRef(null)
+  const mouse = useRef(null)
+  const [dragging, setDragging] = useState(false)
 
   const show = (index, requestedDirection) => {
     setSlideState(state => {
@@ -36,7 +38,7 @@ const Hero = () => {
   useEffect(() => {
     const timer = window.setInterval(() => {
       // Do not rotate underneath a finger during a gesture.
-      if (touch.current) return
+      if (touch.current || mouse.current) return
       setSlideState(state => ({ current: (state.current + 1) % SLIDES.length, previous: state.current, direction: 'next' }))
     }, 7000)
     return () => window.clearInterval(timer)
@@ -58,6 +60,30 @@ const Hero = () => {
     if (!start || !event.changedTouches[0]) return
     const dx = event.changedTouches[0].clientX - start.x
     const dy = event.changedTouches[0].clientY - start.y
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.3) return
+    show(current + (dx < 0 ? 1 : -1), dx < 0 ? 'next' : 'prev')
+  }
+
+  const startMouseDrag = event => {
+    if (event.pointerType !== 'mouse' || event.button !== 0 || event.target.closest('button')) return
+    mouse.current = { x: event.clientX, y: event.clientY, pointerId: event.pointerId }
+    setDragging(true)
+    event.currentTarget.setPointerCapture?.(event.pointerId)
+    event.preventDefault()
+  }
+  const cancelMouseDrag = () => {
+    mouse.current = null
+    setDragging(false)
+  }
+  const endMouseDrag = event => {
+    const start = mouse.current
+    if (!start || event.pointerId !== start.pointerId) return
+    cancelMouseDrag()
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+    const dx = event.clientX - start.x
+    const dy = event.clientY - start.y
     if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.3) return
     show(current + (dx < 0 ? 1 : -1), dx < 0 ? 'next' : 'prev')
   }
@@ -85,6 +111,11 @@ const Hero = () => {
           <div
             className='ins-carousel'
             data-direction={direction}
+            data-dragging={dragging}
+            onPointerDown={startMouseDrag}
+            onPointerUp={endMouseDrag}
+            onPointerCancel={cancelMouseDrag}
+            onLostPointerCapture={cancelMouseDrag}
             onTouchStart={startTouch}
             onTouchEnd={endTouch}
             onTouchCancel={() => { touch.current = null }}
@@ -112,7 +143,6 @@ const Hero = () => {
                         objectFit: 'cover'
                       }}
                     />
-                    <span className='ins-slide-label'>{slide.label}</span>
                   </div>
                 )
               })}
@@ -123,14 +153,18 @@ const Hero = () => {
               type='button'
               aria-label='上一张'
               onClick={() => show(current - 1, 'prev')}>
-              ‹
+              <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeLinecap='round' strokeLinejoin='round' aria-hidden='true'>
+                <path d='M15 5 8 12 15 19' />
+              </svg>
             </button>
             <button
               className='ins-carousel-arrow next'
               type='button'
               aria-label='下一张'
               onClick={() => show(current + 1, 'next')}>
-              ›
+              <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeLinecap='round' strokeLinejoin='round' aria-hidden='true'>
+                <path d='m9 5 7 7-7 7' />
+              </svg>
             </button>
 
             <div className='ins-carousel-dots'>
