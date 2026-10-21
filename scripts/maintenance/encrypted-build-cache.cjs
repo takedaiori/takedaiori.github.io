@@ -32,7 +32,7 @@ if (mode === 'save') {
           const record = JSON.parse(fs.readFileSync(p, 'utf8'))
           if (!/^page_block_.+_\d{10,}$/.test(record.key || '')) continue
           // Limit reuse age even when last-edited timestamps fail to reflect a nested edit.
-          if (Date.now() - record.updatedAt > 6 * 60 * 60 * 1000) continue
+          if (!Number.isFinite(record.updatedAt) || Date.now() - record.updatedAt > 6 * 60 * 60 * 1000) continue
         } catch { continue }
       }
       entries.push([rel, fs.readFileSync(p).toString('base64')])
@@ -56,6 +56,13 @@ if (mode === 'save') {
     let count = 0
     for (const [rel, value] of payload.entries) {
       if (!allowed(rel) || rel.includes('..') || path.isAbsolute(rel)) throw Error('path')
+      if (rel.startsWith('notion/')) {
+        const record = JSON.parse(Buffer.from(value, 'base64').toString())
+        if (!/^page_block_.+_\d{10,}$/.test(record.key || '') ||
+            !Number.isFinite(record.updatedAt) ||
+            Date.now() - record.updatedAt > 6 * 60 * 60 * 1000 ||
+            (record.expireTime && record.expireTime <= Date.now())) continue
+      }
       const p = path.join(root, rel)
       fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, Buffer.from(value, 'base64')); count++
     }
