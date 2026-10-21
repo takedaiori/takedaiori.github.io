@@ -58,7 +58,7 @@ jobs:
       - name: Restore encrypted build cache
         id: build-cache
         if: ${{ !inputs.clean_build && env.HAS_BUILD_CACHE_KEY == 'true' }}
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: .build-cache/cache.enc
           key: pages-encrypted-v1-${{ runner.os }}-${{ hashFiles('yarn.lock', 'next.config.js', 'lib/cache/**', 'lib/db/**', 'scripts/maintenance/encrypted-build-cache.cjs') }}-${{ github.run_id }}-${{ github.run_attempt }}
@@ -85,7 +85,7 @@ jobs:
 
       - name: Save encrypted build cache
         if: ${{ env.HAS_BUILD_CACHE_KEY == 'true' }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: .build-cache/cache.enc
           key: pages-encrypted-v1-${{ runner.os }}-${{ hashFiles('yarn.lock', 'next.config.js', 'lib/cache/**', 'lib/db/**', 'scripts/maintenance/encrypted-build-cache.cjs') }}-${{ github.run_id }}-${{ github.run_attempt }}
