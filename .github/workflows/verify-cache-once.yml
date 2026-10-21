@@ -1,0 +1,41 @@
+name: Cache verification (temporary)
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/verify-cache-once.yml']
+permissions:
+  actions: write
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            async function deploy(clean) {
+              const before = new Date().toISOString();
+              await github.rest.actions.createWorkflowDispatch({...context.repo, workflow_id:'deploy-pages.yml', ref:'main', inputs:{clean_build:String(clean)}});
+              let id;
+              for(let i=0;i<180;i++){
+                const {data} = await github.rest.actions.listWorkflowRuns({...context.repo,workflow_id:'deploy-pages.yml',event:'workflow_dispatch',per_page:10});
+                const run=data.workflow_runs.find(r=>r.created_at>=before && r.actor.login==='github-actions[bot]');
+                if(run) {id=run.id;break;}
+                await new Promise(r=>setTimeout(r,5000));
+              }
+              if(!id) throw Error('Dispatched run not found');
+              core.info((clean?'COLD':'WARM')+' run: '+id);
+              for(let i=0;i<210;i++){
+                const {data:r}=await github.rest.actions.getWorkflowRun({...context.repo,run_id:id});
+                if(r.status==='completed'){
+                  if(r.conclusion!=='success')throw Error('Deployment '+id+': '+r.conclusion);
+                  await core.summary.addRaw((clean?'Cold':'Warm')+' deployment succeeded: '+r.html_url+'\n').write();
+                  return;
+                }
+                await new Promise(r=>setTimeout(r,5000));
+              }
+              throw Error('Deployment did not finish within verification window');
+            }
+            await deploy(true);
+            await deploy(false);
