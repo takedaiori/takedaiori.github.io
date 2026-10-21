@@ -1,10 +1,10 @@
 # Dependency maintenance and build cache
 
-Dependency maintenance runs after successful CI for a same-repository Dependabot PR, or by manual PR number. It accepts changes only to package.json/yarn.lock, verifies successful lint/types, tests, lockfile and CodeQL checks on the exact PR head, then runs the full production-config static export. It reports `Dependency static export` on the PR head.
+Dependency maintenance runs after successful CI or CodeQL for a same-repository Dependabot PR, or by manual PR number. It accepts changes only to package.json/yarn.lock, verifies successful lint/types, tests, lockfile and CodeQL checks on the exact PR head, then runs the full production-config static export. It reports `Dependency static export` on the PR head.
 
 Only patch updates to existing `@testing-library/user-event` and `eslint-plugin-prettier` dev dependencies can merge automatically. Any other manifest change, including scripts, resolutions or production dependencies, requires human review. Successful automatic merges explicitly dispatch deploy-pages.yml. This is a check-driven merge workflow and does not need the repository's native Allow auto-merge setting. Existing branch rules continue to apply. Actions updates remain manual.
 
-If CodeQL has not completed when CI finishes, this run stops before export; manually run Dependency maintenance with the PR number after checks complete. Failed exports never reach the merge job. Changes to PR head SHA invalidate the merge attempt.
+If a required check is pending, the run stops before export; completion of the other workflow retries eligibility. An already successful export on the exact head skips duplicate validation. Manual PR-number runs provide a retry after failures. Failed exports never reach the merge job. Changes to PR head SHA invalidate the merge attempt.
 
 ## Cache setup
 

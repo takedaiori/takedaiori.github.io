@@ -16,6 +16,7 @@ module.exports = async ({ github, context, core }) => {
   if (!files.length || files.some(f => !['package.json', 'yarn.lock'].includes(f.filename))) return
   // Only accept successful checks produced by GitHub Actions on this exact head.
   const runs = await github.paginate(github.rest.checks.listForRef, { ...repo, ref: pr.head.sha, per_page: 100 })
+  if (runs.some(c => c.name === 'Dependency static export' && c.app?.slug === 'github-actions' && c.conclusion === 'success')) return
   const required = ['Lint & type-check', 'Unit tests', 'Lockfile consistency', 'Analyze (javascript-typescript)']
   for (const name of required) {
     const check = runs.filter(c => c.name === name && c.app?.slug === 'github-actions').sort((a,b) => b.id-a.id)[0]
