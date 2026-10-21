@@ -31,7 +31,7 @@ jobs:
         with:
           ref: main
           persist-credentials: false
-      - uses: actions/github-script@v8
+      - uses: actions/github-script@v9
         id: policy
         with:
           script: |
@@ -73,7 +73,7 @@ jobs:
     permissions:
       checks: write
     steps:
-      - uses: actions/github-script@v8
+      - uses: actions/github-script@v9
         env:
           HEAD_SHA: ${{ needs.gate.outputs.sha }}
           EXPORT_RESULT: ${{ needs.export.result }}
@@ -93,7 +93,7 @@ jobs:
       pull-requests: write
       actions: write
     steps:
-      - uses: actions/github-script@v8
+      - uses: actions/github-script@v9
         env:
           PR_NUMBER: ${{ needs.gate.outputs.pr }}
           EXPECTED_SHA: ${{ needs.gate.outputs.sha }}
