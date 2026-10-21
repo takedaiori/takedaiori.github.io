@@ -7,15 +7,21 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 8
-    labels:
-      - dependencies
     commit-message:
       prefix: chore
     groups:
+      safe-tool-patches:
+        patterns:
+          - '@testing-library/user-event'
+          - 'eslint-plugin-prettier'
+        update-types: [patch]
       dev-dependencies:
         dependency-type: development
         patterns:
           - '*'
+        exclude-patterns:
+          - '@testing-library/user-event'
+          - 'eslint-plugin-prettier'
     ignore:
       - dependency-name: '*'
         update-types: [version-update:semver-major]
@@ -24,5 +30,3 @@ updates:
     directory: /
     schedule:
       interval: monthly
-    labels:
-      - dependencies
