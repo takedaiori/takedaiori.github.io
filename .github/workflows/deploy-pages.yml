@@ -2,6 +2,11 @@ name: Deploy NotionNext to GitHub Pages
 
 on:
   workflow_dispatch:
+    inputs:
+      clean_build:
+        description: Ignore previous build cache
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -25,6 +30,7 @@ jobs:
       NEXT_PUBLIC_LINK: https://takedaiori.github.io
       BUILD_PREFETCH_ENABLED: "false"
       STATIC_PAGE_GENERATION_TIMEOUT: "600"
+      HAS_BUILD_CACHE_KEY: ${{ secrets.BUILD_CACHE_KEY != '' }}
 
     steps:
       - name: Checkout repository
@@ -34,6 +40,7 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: "22"
+          cache: yarn
 
       - name: Install Yarn 1
         run: npm install -g yarn@1.22.22
@@ -48,8 +55,40 @@ jobs:
             exit 1
           fi
 
+      - name: Restore encrypted build cache
+        id: build-cache
+        if: ${{ !inputs.clean_build && env.HAS_BUILD_CACHE_KEY == 'true' }}
+        uses: actions/cache/restore@v4
+        with:
+          path: .build-cache/cache.enc
+          key: pages-encrypted-v1-${{ runner.os }}-${{ hashFiles('yarn.lock', 'next.config.js', 'lib/cache/**', 'lib/db/**', 'scripts/maintenance/encrypted-build-cache.cjs') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            pages-encrypted-v1-${{ runner.os }}-${{ hashFiles('yarn.lock', 'next.config.js', 'lib/cache/**', 'lib/db/**', 'scripts/maintenance/encrypted-build-cache.cjs') }}-
+
+      - name: Decrypt recent versioned cache
+        if: ${{ !inputs.clean_build && env.HAS_BUILD_CACHE_KEY == 'true' }}
+        env:
+          BUILD_CACHE_KEY: ${{ secrets.BUILD_CACHE_KEY }}
+        run: node scripts/maintenance/encrypted-build-cache.cjs restore
+
       - name: Export static site
-        run: yarn export
+        run: |
+          started=$SECONDS
+          yarn export
+          echo "Static export: $((SECONDS-started)) seconds" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Encrypt successful build cache
+        if: ${{ env.HAS_BUILD_CACHE_KEY == 'true' }}
+        env:
+          BUILD_CACHE_KEY: ${{ secrets.BUILD_CACHE_KEY }}
+        run: node scripts/maintenance/encrypted-build-cache.cjs save
+
+      - name: Save encrypted build cache
+        if: ${{ env.HAS_BUILD_CACHE_KEY == 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: .build-cache/cache.enc
+          key: pages-encrypted-v1-${{ runner.os }}-${{ hashFiles('yarn.lock', 'next.config.js', 'lib/cache/**', 'lib/db/**', 'scripts/maintenance/encrypted-build-cache.cjs') }}-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Add .nojekyll
         run: touch out/.nojekyll

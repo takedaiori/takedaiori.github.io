@@ -35,6 +35,8 @@ jobs:
           node-version-file: .nvmrc
           cache: yarn
       - run: yarn install --frozen-lockfile
+      - run: node scripts/maintenance/dependabot-policy.cjs
+      - run: node scripts/maintenance/cache-selftest.cjs
       - run: yarn test --passWithNoTests
 
   lockfile:

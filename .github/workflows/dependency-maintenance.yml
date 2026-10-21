@@ -1,0 +1,108 @@
+name: Dependency maintenance
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Dependabot npm PR number to validate
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: dependency-maintenance
+  cancel-in-progress: false
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      checks: read
+    outputs:
+      eligible: ${{ steps.policy.outputs.eligible }}
+      sha: ${{ steps.policy.outputs.sha }}
+      pr: ${{ steps.policy.outputs.pr }}
+      auto: ${{ steps.policy.outputs.auto }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/github-script@v8
+        id: policy
+        with:
+          script: |
+            await require('./scripts/maintenance/dependabot-gate.cjs')({github, context, core})
+  export:
+    needs: gate
+    if: needs.gate.outputs.eligible == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      NOTION_PAGE_ID: ${{ secrets.NOTION_PAGE_ID }}
+      NEXT_PUBLIC_THEME: insignificantia
+      NEXT_PUBLIC_THEME_SWITCH: 'false'
+      NEXT_PUBLIC_WIDGET_PET: 'false'
+      NEXT_PUBLIC_WIDGET_PET_SWITCH_THEME: 'false'
+      NEXT_PUBLIC_POSTS_PER_PAGE: '15'
+      NEXT_PUBLIC_LINK: https://takedaiori.github.io
+      BUILD_PREFETCH_ENABLED: 'false'
+      STATIC_PAGE_GENERATION_TIMEOUT: '600'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.gate.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: yarn
+      - run: npm install -g yarn@1.22.22
+      - run: yarn install --frozen-lockfile
+      - name: Validate data source
+        run: test -n "$NOTION_PAGE_ID"
+      - name: Full static export
+        run: yarn export
+  report:
+    needs: [gate, export]
+    if: ${{ always() && needs.gate.outputs.eligible == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+    steps:
+      - uses: actions/github-script@v8
+        env:
+          HEAD_SHA: ${{ needs.gate.outputs.sha }}
+          EXPORT_RESULT: ${{ needs.export.result }}
+        with:
+          script: |
+            await github.rest.checks.create({
+              ...context.repo, name: 'Dependency static export', head_sha: process.env.HEAD_SHA,
+              status: 'completed', conclusion: process.env.EXPORT_RESULT === 'success' ? 'success' : 'failure',
+              output: {title: 'Full production-config static export', summary: `Export result: ${process.env.EXPORT_RESULT}. Runtime dependency updates still require human review.`}
+            });
+  merge:
+    needs: [gate, export, report]
+    if: needs.gate.outputs.auto == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    steps:
+      - uses: actions/github-script@v8
+        env:
+          PR_NUMBER: ${{ needs.gate.outputs.pr }}
+          EXPECTED_SHA: ${{ needs.gate.outputs.sha }}
+        with:
+          script: |
+            const args = {...context.repo, pull_number: Number(process.env.PR_NUMBER)};
+            const {data: pr} = await github.rest.pulls.get(args);
+            if (pr.state !== 'open' || pr.user.login !== 'dependabot[bot]' || pr.head.sha !== process.env.EXPECTED_SHA) throw Error('PR changed; refusing merge');
+            const {data: result} = await github.rest.pulls.merge({...args, sha: process.env.EXPECTED_SHA, merge_method: 'squash'});
+            if (!result.merged) throw Error('Merge rejected');
+            await github.rest.actions.createWorkflowDispatch({...context.repo, workflow_id: 'deploy-pages.yml', ref: 'main'});
+            await core.summary.addRaw(`Merged PR #${pr.number} after CI and full export; Pages deployment dispatched.`).write();
