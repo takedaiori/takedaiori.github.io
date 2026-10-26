@@ -93,10 +93,10 @@
     "remixicon-react": "^1.0.0"
   },
   "devDependencies": {
-    "@ai-sdk/google": "^4.0.93",
-    "@ai-sdk/vue": "^4.0.137",
+    "@ai-sdk/google": "^4.0.104",
+    "@ai-sdk/vue": "^4.0.150",
     "@lhci/cli": "^0.15.1",
-    "@netlify/plugin-nextjs": "^5.16.2",
+    "@netlify/plugin-nextjs": "^5.16.4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^14.1.2",
     "@testing-library/user-event": "^14.6.8",
@@ -104,7 +104,7 @@
     "@types/react": "18.3.10",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
-    "@waline/client": "^3.16.0",
+    "@waline/client": "^3.16.1",
     "ai": "^7.0.19",
     "autoprefixer": "^10.6.1",
     "cross-env": "^7.0.3",
@@ -123,13 +123,13 @@
     "marked": "^18.0.13",
     "marked-highlight": "^2.2.4",
     "next-sitemap": "^1.9.12",
-    "postcss": "^8.5.29",
+    "postcss": "^8.5.31",
     "prettier": "^3.9.10",
     "sharp": "^0.35.5",
     "tailwindcss": "^3.4.19",
     "typescript": "5.9.3",
     "webpack-bundle-analyzer": "^4.5.0",
-    "zod": "^4.6.6"
+    "zod": "^4.6.7"
   },
   "resolutions": {
     "axios": ">=0.21.1",
