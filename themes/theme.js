@@ -10,62 +10,69 @@ const baseLayoutCache = new Map()
 const layoutByThemeCache = new Map()
 let domFixTimer = null
 
-const LayoutLoading = () => (
-  <div
-    data-ins-loading='page'
-    className='min-h-screen w-full bg-[#202d35]'
-  />
+/**
+ * Text-only placeholder while a page layout chunk is loading.
+ * Remains below the existing header; ready-page styles are untouched.
+ */
+const PageLayoutLoading = ({ home = false }) => (
+  <main data-ins-loading={home ? 'home' : 'page'} role='status' aria-live='polite'>
+    <div className='ins-layout-loading-label'>
+      <span className='ins-layout-loading-spinner' aria-hidden='true' />
+      <span>LOADING…</span>
+    </div>
+    <style jsx>{`
+      main {
+        min-height: calc(100vh - 78px);
+        min-height: calc(100dvh - 78px);
+        width: 100%;
+        display: grid;
+        place-items: center;
+        background: var(--ins-bg, #202d35);
+        color: var(--ins-pink, #ed8eac);
+        font-family: var(--ins-ui-font, "Avenir Next", "Segoe UI Variable Display",
+          "SF Pro Display", "Helvetica Neue", Arial, "PingFang SC",
+          "Microsoft YaHei", sans-serif);
+      }
+      .ins-layout-loading-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        font-size: 14px;
+        font-weight: 650;
+        letter-spacing: 0.16em;
+        line-height: 1.5;
+      }
+      .ins-layout-loading-spinner {
+        width: 24px;
+        height: 24px;
+        box-sizing: border-box;
+        border: 2px solid rgba(237, 142, 172, 0.2);
+        border-top-color: currentColor;
+        border-radius: 50%;
+        animation: ins-layout-loading-spin 900ms linear infinite;
+      }
+      @keyframes ins-layout-loading-spin {
+        to { transform: rotate(360deg); }
+      }
+      @media (max-width: 760px) {
+        main {
+          min-height: calc(100vh - 70px);
+          min-height: calc(100dvh - 70px);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .ins-layout-loading-spinner { animation: none; }
+      }
+    `}</style>
+  </main>
 )
+
+const LayoutLoading = () => <PageLayoutLoading />
+const IndexLayoutLoading = () => <PageLayoutLoading home />
 
 const EmptyBaseLayout = ({ children }) => <>{children}</>
 const EmptyPageLayout = () => null
-
-/**
- * Insignificantia. loading shell.
- *
- * IMPORTANT:
- * This replaces only the visual placeholder used while LayoutIndex is
- * dynamically imported. It does not change theme resolution, routing,
- * caching, fallback, or data loading logic.
- */
-const IndexLayoutLoading = () => (
-  <main
-    data-ins-loading='home'
-    className='min-h-screen w-full bg-[#202d35] text-[#f2eee4]'>
-    <section className='min-h-[650px] w-full border-b border-[rgba(225,231,226,.04)] bg-[#202d35]'>
-      <div className='mx-auto grid min-h-[650px] w-full max-w-[1400px] items-center gap-[29px] px-[34px] py-[82px] xl:grid-cols-[minmax(0,1fr)_620px]'>
-        <div>
-          <div className='mb-[22px] h-3 w-44 animate-pulse rounded-sm bg-[#ed8eac]/35' />
-          <div className='h-16 w-[86%] max-w-[640px] animate-pulse rounded-md bg-[#f2eee4]/10' />
-          <div className='mt-5 h-16 w-[72%] max-w-[520px] animate-pulse rounded-md bg-[#f2eee4]/10' />
-          <div className='mt-8 h-4 w-[76%] max-w-[610px] animate-pulse rounded-sm bg-[#aeb9b9]/15' />
-          <div className='mt-3 h-4 w-[58%] max-w-[470px] animate-pulse rounded-sm bg-[#aeb9b9]/15' />
-          <div className='mt-8 flex gap-3'>
-            <div className='h-11 w-28 animate-pulse rounded-[9px] bg-[#ed8eac]/28' />
-            <div className='h-11 w-24 animate-pulse rounded-[9px] border border-[rgba(237,142,172,.28)] bg-transparent' />
-          </div>
-        </div>
-
-        <div className='w-full'>
-          <div className='aspect-[1.17/1] w-full animate-pulse rounded-[9px] border border-[rgba(225,231,226,.10)] bg-[#2b3942]' />
-        </div>
-      </div>
-    </section>
-
-    <section className='mx-auto w-full max-w-[900px] px-[18px] py-[88px] md:px-0'>
-      {[0, 1, 2].map(item => (
-        <div
-          key={item}
-          className='mb-11 rounded-[9px] border border-[rgba(225,231,226,.10)] bg-[#2b3942] px-8 py-9 md:px-[54px] md:py-[46px]'>
-          <div className='h-3 w-28 animate-pulse rounded-sm bg-[#ed8eac]/30' />
-          <div className='mt-5 h-8 w-[72%] animate-pulse rounded-sm bg-[#f2eee4]/10' />
-          <div className='mt-5 h-4 w-full animate-pulse rounded-sm bg-[#aeb9b9]/13' />
-          <div className='mt-3 h-4 w-[84%] animate-pulse rounded-sm bg-[#aeb9b9]/13' />
-        </div>
-      ))}
-    </section>
-  </main>
-)
 
 const getLayoutLoading = layoutName => {
   if (layoutName === 'LayoutIndex') {
