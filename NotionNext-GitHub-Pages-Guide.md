@@ -1,9 +1,9 @@
 # NotionNext + GitHub Pages 通用开发文档
 
-**V0.61 · 正式运行与可复用设计规范**  
-修订日期：2026-10-21（香港时间）
+**V0.62 · 正式运行与可复用设计规范**  
+修订日期：2026-10-27（香港时间）
 
-这是一份可公开复用的建站与维护规格。V0.6 在既有架构、发布和分页规则上，结合技术与设计规格V0.8，新增第5节的阅读导航、轮播、图片加载、滚动导航和目录交互标准。具体主题可调整数值，但必须分别定义可见尺寸、交互范围、输入方式及验收方法。环境数据使用占位符，不写入真实凭据或私人后台信息。 V0.61 保留上述标准，新增第25至28节：辅助工作流故障定位、依赖更新与有条件自动合并、加密构建缓存及密钥维护。冲突时以本次新增的现行规则为准。
+这是一份可公开复用的建站与维护规格。V0.6 在既有架构、发布和分页规则上，结合技术与设计规格V0.8，新增第5节的阅读导航、轮播、图片加载、滚动导航和目录交互标准。具体主题可调整数值，但必须分别定义可见尺寸、交互范围、输入方式及验收方法。环境数据使用占位符，不写入真实凭据或私人后台信息。 V0.62 于2026年10月27日补充第29至31节的文字分享预览、页面加载占位及发布验收边界。 V0.61 保留上述标准，新增第25至28节：辅助工作流故障定位、依赖更新与有条件自动合并、加密构建缓存及密钥维护。冲突时以本次新增的现行规则为准。
 
 ## 1. 系统目标与总体架构
 
@@ -679,6 +679,38 @@ Next.js 静态导出与不支持 ISR：https://nextjs.org/docs/pages/guides/stat
 Google sitemap：https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap；Indexing API：https://developers.google.com/search/apis/indexing-api/v3/quickstart
 
 密钥管理：https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html
+
+## 29 社媒链接文字预览
+
+### 文字摘要预览的现行规则
+
+分享链接时仅主动提供标题、摘要、地址、站点名称等文字元数据。components/SEO.js 已移除 og:image、og:image:width、og:image:height、og:image:alt、twitter:image 和 twitter:image:alt；twitter:card 从 summary_large_image 改为 summary。取消将文章封面或默认 /bg_image.jpg 传给分享图片的处理，调用 generateStructuredData 时图片参数传 undefined，因此文章结构化数据不再输出该 image 字段。
+
+本次为全站策略，首页、文章和其他使用该 SEO 组件的页面均适用，包括有封面的文章。保留 og:title、og:description、twitter:title、twitter:description、canonical、站点图标和发布者 logo。正文图片、Hero、作品集及站内封面显示不因本次调整而删除。
+
+网站不再主动声明分享配图，不等于可以强制每个平台只显示文字。平台可能缓存旧卡片或自行选取页面图片；已发布帖子的预览不保证追溯更新。部署后应重新分享并观察；若需要临时完全取消 Telegram 预览，可在发送前点击预览旁的 ×，但标题和摘要卡片也会一并消失。不能把移除图片元数据描述为禁止平台抓取图片。
+
+## 30 页面布局加载占位
+
+### 导航栏下方的加载占位
+
+截图中的首页方框来自 themes/theme.js 的 IndexLayoutLoading 骨架占位。现以 PageLayoutLoading 统一文字加载占位，LayoutLoading 和 IndexLayoutLoading 分别复用；不再显示灰色方框、卡片和占位按钮。保留既有导航栏，导航栏以下显示居中的 LOADING… 与简单旋转圆环，页面布局组件就绪后由动态加载机制自动替换为原页面。
+
+占位背景使用 --ins-bg（fallback #202d35），文字和圆环使用 --ins-pink（fallback #ed8eac），字体使用 --ins-ui-font 及与站点一致的后备字体。文字14px、字重650、字距0.16em；圆环24×24px、2px边线、900ms匀速旋转，与文字间隔18px。可用高度为100dvh减去桌面导航78px；≤760px时减去70px，同时保留100vh后备值。
+
+容器使用 role=status 与 aria-live=polite，装饰圆环 aria-hidden=true；prefers-reduced-motion: reduce 时停止旋转但保留文字。未更改已加载页面布局、色彩、导航交互、原有入场动效、路由分流或数据获取逻辑。
+
+完成条件必须按实际实现解释：本次替换的是动态布局组件的 loading fallback，不是等待全站所有图片、字体、懒加载资源或第三方请求全部结束的全屏闸门。页面组件显示后，图片仍可按既有 ImageLoading 逻辑局部加载；不得因此声称所有资源已彻底下载完成。
+
+## 31 发布与验收边界
+
+### 发布验收与维护边界
+
+两项源码修改均已提交并回读核对：分享图片元数据已移除，summary 卡片与标题摘要保留；骨架已替换，主题解析与路由逻辑保持原样。此前记录未包含完整构建、部署及实机验收，本次文档更新也不将这些状态写成已通过。
+
+部署前确认包含上述修改的提交已进入 main。打开仓库 Actions → Deploy NotionNext to GitHub Pages → Run workflow，分支 main；通常不勾选 Ignore previous build cache。新建运行，待 build 与 deploy 均成功后，分别验收公开页面和平台预览；Re-run 旧任务不代表部署最新提交。
+
+加载验收覆盖首次访问、缓存访问、慢速网络、手机与桌面、页面切换和减少动态效果：导航栏可见，方框不出现，LOADING… 在导航下可用视口中央，组件就绪后提示移除且原布局恢复。分享验收覆盖首页、无封面文章和有封面文章，查看生成 HTML 的元数据并实际重新分享；区分源码验证、静态导出、Pages 部署与平台缓存结果。
 
 ## 本版依据与验证范围
 
