@@ -572,6 +572,23 @@ export const Style = () => {
         font-size: 12px;
       }
 
+
+      /* Keep the inverse hover treatment inside the shared site footer only. */
+      @media (hover: hover) {
+        #theme-insignificantia .ins-site-footer:hover {
+          background: var(--ins-pink);
+          color: var(--ins-bg);
+        }
+        #theme-insignificantia .ins-site-footer:hover * {
+          color: inherit;
+        }
+        #theme-insignificantia .ins-site-footer:hover::selection,
+        #theme-insignificantia .ins-site-footer:hover *::selection {
+          background: var(--ins-bg);
+          color: var(--ins-pink);
+        }
+      }
+
       .ins-footer-inner {
         max-width: var(--ins-shell);
         margin: auto;
