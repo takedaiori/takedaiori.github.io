@@ -86,7 +86,7 @@ export default function LazyImage({
     }
 
     // 如果是优先级图片，直接加载
-    if (priority) {
+    if (priority || window.__insInitialImagesPending) {
       const img = new Image()
       img.src = adjustedImageSrc
       img.onload = () => {

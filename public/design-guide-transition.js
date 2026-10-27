@@ -53,6 +53,7 @@
     if (!root.classList.contains('ins-guide-arriving')) return
     try {
       await readyContent()
+      if (window.InsignificantiaImages) await window.InsignificantiaImages.initialReady
       var images = isGuide(location.pathname)
         ? [document.getElementById('hero-image')]
         : Array.from(document.querySelectorAll('.ins-carousel img')).slice(0, 1)

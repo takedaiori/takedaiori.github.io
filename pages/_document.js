@@ -1,5 +1,6 @@
 // eslint-disable-next-line @next/next/no-document-import-in-page
 import BLOG from '@/blog.config'
+import { imageRevealBootstrap, imageRevealStyle } from '@/lib/utils/imageRevealBootstrap'
 import Document, { Head, Html, Main, NextScript } from 'next/document'
 
 const isLocalFontAwesome = BLOG.FONT_AWESOME?.startsWith(
@@ -52,6 +53,9 @@ class MyDocument extends Document {
         <Head>
           <style dangerouslySetInnerHTML={{ __html: guideTransitionStyle }} />
           <script dangerouslySetInnerHTML={{ __html: guideTransitionBootstrap }} />
+          <style dangerouslySetInnerHTML={{ __html: imageRevealStyle }} />
+          <script dangerouslySetInnerHTML={{ __html: imageRevealBootstrap }} />
+          <script src='/image-reveal.js' defer />
           <script src='/design-guide-transition.js' defer />
           <link rel='preconnect' href='https://images.unsplash.com' />
           <link rel='dns-prefetch' href='//images.unsplash.com' />
