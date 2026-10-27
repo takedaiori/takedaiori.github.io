@@ -10,6 +10,7 @@
   var quietTimer
   var releaseTimer
   var released = false
+  var destroyed = false
   var resolveInitial
   var selector = '#theme-insignificantia img, .ins-lightbox img, main.wrap img'
   var initialReady = new Promise(function (resolve) { resolveInitial = resolve })
@@ -127,6 +128,7 @@
     update(image)
   }
   function scan() {
+    if (destroyed) return
     document.querySelectorAll(selector).forEach(watch)
     images.forEach(function (state, image) {
       if (!image.isConnected) {
@@ -158,10 +160,39 @@
   })
   observer.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['src', 'srcset', 'sizes', 'class', 'data-src'] })
   document.addEventListener('ins-images-scan', scheduleScan)
-  window.addEventListener('pageshow', function (event) {
+  function onPageShow(event) {
     if (event.persisted) { root.classList.remove('ins-initial-loading'); scan() }
-  })
-  window.InsignificantiaImages = { initialReady: initialReady, scan: scan }
+  }
+  window.addEventListener('pageshow', onPageShow)
+  function destroy() {
+    destroyed = true
+    observer.disconnect()
+    clearTimeout(quietTimer)
+    clearTimeout(releaseTimer)
+    clearTimeout(window.__insImageRecovery)
+    document.removeEventListener('ins-images-scan', scheduleScan)
+    window.removeEventListener('pageshow', onPageShow)
+    images.forEach(function (state, image) {
+      image.removeEventListener('load', state.onLoad)
+      image.removeEventListener('error', state.onError)
+      image.removeAttribute('data-ins-image-state')
+    })
+    hosts.forEach(function (state, host) {
+      if (state.positioned) host.style.position = state.position
+      host.classList.remove('ins-image-loading')
+      host.removeAttribute('aria-busy')
+      host.removeAttribute('data-ins-image-group')
+    })
+    images.clear()
+    hosts.clear()
+    released = true
+    initial = false
+    window.__insInitialImagesPending = false
+    root.classList.remove('ins-image-js', 'ins-initial-loading')
+    delete window.InsignificantiaImages
+    resolveInitial()
+  }
+  window.InsignificantiaImages = { initialReady: initialReady, scan: scan, destroy: destroy }
   if (initial) releaseTimer = setTimeout(function () { release('timeout') }, 12000)
   else { released = true; resolveInitial() }
   scan()
