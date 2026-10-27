@@ -114,11 +114,8 @@
   var touchY = 0
   window.addEventListener('touchstart', function (e) { touchY = e.touches[0] ? e.touches[0].clientY : 0 }, { passive: true })
   window.addEventListener('touchmove', function (e) { if (e.touches[0]) { var y = e.touches[0].clientY; updateFooter(y < touchY); touchY = y } }, { passive: true })
-  var observed = null
-  var observer = new IntersectionObserver(function (entries) { if (entries.some(function (item) { return item.isIntersecting })) warmGuide() }, { rootMargin: '600px' })
+  // Fetch the guide only after an explicit footer click, never on proximity.
   function bindFooter() {
-    var footer = document.querySelector('.ins-site-footer')
-    if (footer && footer !== observed) { if (observed) observer.unobserve(observed); observed = footer; observer.observe(footer) }
     setReturn()
   }
   var mutations = new MutationObserver(bindFooter)
