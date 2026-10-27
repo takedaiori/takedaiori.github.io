@@ -565,6 +565,7 @@ export const Style = () => {
 
       /* Footer */
       .ins-site-footer {
+        transition: background-color 320ms ease, color 320ms ease;
         background: var(--ins-bg-deep);
         border-top: 1px solid rgba(225, 231, 226, 0.06);
         padding: 38px 34px;
@@ -734,6 +735,8 @@ export const Style = () => {
       }
 
       @media (prefers-reduced-motion: reduce) {
+        .ins-site-footer { transition: none; }
+
         * {
           scroll-behavior: auto !important;
         }
