@@ -6,6 +6,9 @@ const isLocalFontAwesome = BLOG.FONT_AWESOME?.startsWith(
   '/vendor/fontawesome/'
 )
 
+const guideTransitionBootstrap = "(function(){try{var r=document.documentElement,k='insignificantia.guide.navigation.v2',m=JSON.parse(sessionStorage.getItem(k)||'null');if(m&&Date.now()-m.time<15000&&m.path===location.pathname+location.search){r.classList.add('ins-guide-arriving');r.dataset.insGuideMode=m.mode;if('scrollRestoration'in history)history.scrollRestoration='manual';setTimeout(function(){r.classList.remove('ins-guide-arriving')},6500)}}catch(e){}})()"
+const guideTransitionStyle = 'html.ins-guide-arriving,html.ins-guide-leaving{background:#202d35}\nbody{transition:opacity 420ms ease}\nhtml.ins-guide-arriving body,html.ins-guide-leaving body{opacity:0!important;pointer-events:none}\nhtml.ins-guide-leaving body{transition:opacity 320ms ease}\nhtml.ins-guide-arriving .ins-page-enter{animation-play-state:paused}\nhtml[data-ins-guide-mode="return"] .ins-page-enter{animation:none!important}\nhtml[data-ins-guide-mode="guide"] body>.top,html[data-ins-guide-mode="guide"] body>main{animation:none!important}\nhtml.ins-guide-arriving .ins-site-header{transform:none!important;opacity:1!important}\n@media(prefers-reduced-motion:reduce){body,html.ins-guide-leaving body{transition:none!important}}\n'
+
 // 预先设置深色模式的脚本内容
 const darkModeScript = `
 (function() {
@@ -47,6 +50,9 @@ class MyDocument extends Document {
     return (
       <Html lang={BLOG.LANG}>
         <Head>
+          <style dangerouslySetInnerHTML={{ __html: guideTransitionStyle }} />
+          <script dangerouslySetInnerHTML={{ __html: guideTransitionBootstrap }} />
+          <script src='/design-guide-transition.js' defer />
           <link rel='preconnect' href='https://images.unsplash.com' />
           <link rel='dns-prefetch' href='//images.unsplash.com' />
 
