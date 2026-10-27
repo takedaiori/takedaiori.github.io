@@ -403,14 +403,6 @@ const nextConfig = {
       ]
     },
   webpack: (config, { dev, isServer }) => {
-    config.ignoreWarnings = [
-      ...(config.ignoreWarnings || []),
-      {
-        module: /[\\/]next[\\/]dist[\\/]esm[\\/]client[\\/]components[\\/]navigation\.js$/,
-        message: /useContext.*not exported from ['"]react['"]/i
-      }
-    ]
-
     // 动态主题：添加 resolve.alias 配置，将动态路径映射到实际路径
     config.resolve.alias['@'] = path.resolve(__dirname)
     config.resolve.alias['lodash.throttle'] = path.resolve(
@@ -445,7 +437,8 @@ const nextConfig = {
     // cpus: 1,
     scrollRestoration: true,
     // 性能优化实验性功能
-    optimizePackageImports: ['@heroicons/react', 'lodash']
+    // Clerk 5 的 server 聚合入口还导出 App Router auth；按需导入避免将其带入 Pages Router 的中间件构建。
+    optimizePackageImports: ['@heroicons/react', 'lodash', '@clerk/nextjs/server']
   },
   exportPathMap: function (
     defaultPathMap,
