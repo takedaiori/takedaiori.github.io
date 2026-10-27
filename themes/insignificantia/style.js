@@ -568,7 +568,7 @@ export const Style = () => {
         transition: background-color 320ms ease, color 320ms ease;
         background: var(--ins-bg-deep);
         border-top: 1px solid rgba(225, 231, 226, 0.06);
-        padding: 38px 34px;
+        padding: 0;
         color: var(--ins-muted-2);
         font-size: 12px;
       }
@@ -590,6 +590,28 @@ export const Style = () => {
         }
       }
 
+      #theme-insignificantia .ins-footer-link {
+        display: block;
+        padding: 38px 34px;
+        color: inherit !important;
+        text-decoration: none !important;
+      }
+      #theme-insignificantia .ins-site-footer:focus-within,
+      #theme-insignificantia .ins-site-footer.ins-guide-footer-active {
+        background: var(--ins-pink);
+        color: var(--ins-bg);
+      }
+      #theme-insignificantia .ins-site-footer:focus-within *,
+      #theme-insignificantia .ins-site-footer.ins-guide-footer-active * {
+        color: inherit;
+      }
+      #theme-insignificantia .ins-footer-link:focus-visible {
+        outline: 2px solid var(--ins-bg);
+        outline-offset: -6px;
+      }
+      @media (max-width: 760px) {
+        #theme-insignificantia .ins-footer-link { padding: 31px 20px; }
+      }
       .ins-footer-inner {
         max-width: var(--ins-shell);
         margin: auto;
@@ -687,10 +709,32 @@ export const Style = () => {
         }
 
         .ins-site-footer {
-          padding: 31px 20px;
+          padding: 0;
         }
 
-        .ins-footer-inner {
+        #theme-insignificantia .ins-footer-link {
+        display: block;
+        padding: 38px 34px;
+        color: inherit !important;
+        text-decoration: none !important;
+      }
+      #theme-insignificantia .ins-site-footer:focus-within,
+      #theme-insignificantia .ins-site-footer.ins-guide-footer-active {
+        background: var(--ins-pink);
+        color: var(--ins-bg);
+      }
+      #theme-insignificantia .ins-site-footer:focus-within *,
+      #theme-insignificantia .ins-site-footer.ins-guide-footer-active * {
+        color: inherit;
+      }
+      #theme-insignificantia .ins-footer-link:focus-visible {
+        outline: 2px solid var(--ins-bg);
+        outline-offset: -6px;
+      }
+      @media (max-width: 760px) {
+        #theme-insignificantia .ins-footer-link { padding: 31px 20px; }
+      }
+      .ins-footer-inner {
           display: block;
         }
 
