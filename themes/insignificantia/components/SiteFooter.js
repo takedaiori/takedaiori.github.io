@@ -1,23 +1,16 @@
 const SiteFooter = () => {
   return (
     <footer className='ins-site-footer'>
-      {/* Restore the full footer target without nesting the legal links. */}
+      {/* Only blank space opens the guide; text and legal links sit above it. */}
       <a
         className='ins-footer-guide-area'
         href='/design-guide'
         data-ins-guide-enter='true'
-        aria-hidden='true'
-        tabIndex={-1}
+        aria-label='从页脚空白处打开设计指南'
       />
       <div className='ins-footer-content'>
         <div className='ins-footer-heading'>
-          <a
-            className='ins-footer-brand-link'
-            href='/design-guide'
-            data-ins-guide-enter='true'
-            aria-label='查看 Insignificantia 设计指南'>
-            <strong>Insignificantia.</strong>
-          </a>
+          <strong className='ins-footer-brand'>Insignificantia.</strong>
           <nav className='ins-footer-inline-notices' aria-label='站点声明'>
             <a href='/content-rights.html'>内容与许可</a>
             <a href='/privacy.html'>隐私说明</a>
