@@ -23,20 +23,25 @@ concurrency:
 
 jobs:
   install-page-media:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Resolve media package
         id: pack
         shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_PACKAGE_NAME: ${{ inputs.package_name }}
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            PACK='${{ inputs.package_name }}'
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            PACK="$INPUT_PACKAGE_NAME"
           else
             PACK='Insignificantia-page-media.zip'
           fi
@@ -71,7 +76,12 @@ jobs:
           pack, dest = sys.argv[1], sys.argv[2]
 
           with zipfile.ZipFile(pack) as zf:
-              for info in zf.infolist():
+              entries = zf.infolist()
+              if len(entries) > 200 or sum(i.file_size for i in entries) > 200 * 1024 * 1024:
+                  raise SystemExit('Media ZIP exceeds the 200-entry / 200 MiB unpacked limit')
+              for info in entries:
+                  if (info.external_attr >> 16) & 0o170000 == 0o120000:
+                      raise SystemExit('Symbolic links are not allowed in media ZIPs')
                   path = PurePosixPath(info.filename)
                   if path.is_absolute() or '..' in path.parts:
                       raise SystemExit(f'Unsafe ZIP path: {info.filename}')
@@ -175,6 +185,7 @@ jobs:
         shell: bash
         env:
           PACK: ${{ steps.pack.outputs.name }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -192,7 +203,7 @@ jobs:
 
           git commit -m 'Media maintenance: install page image pack'
           git pull --rebase origin main
-          git push origin HEAD:main
+          git -c credential.helper='!f() { echo username=x-access-token; echo "password=$GITHUB_TOKEN"; }; f' push origin HEAD:main
 
       - name: Next step
         shell: bash
