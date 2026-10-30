@@ -574,6 +574,34 @@ export const Style = () => {
       #theme-insignificantia .ins-footer-notices a { color: inherit; }
       .ins-footer-notices a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 
+      .ins-footer-content {
+        max-width: var(--ins-shell);
+        margin: auto;
+        padding: 38px 34px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px 24px;
+        flex-wrap: wrap;
+      }
+      .ins-footer-heading,
+      .ins-footer-inline-notices {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px 20px;
+      }
+      #theme-insignificantia .ins-footer-brand-link,
+      #theme-insignificantia .ins-footer-inline-notices a { color: inherit; }
+      .ins-footer-inline-notices a { white-space: nowrap; }
+      .ins-footer-credit { line-height: 1.7; }
+      @media (max-width: 760px) {
+        .ins-footer-content { padding: 31px 20px; }
+        .ins-footer-heading { gap: 12px 16px; }
+        .ins-footer-inline-notices { gap: 12px 16px; }
+        .ins-footer-credit { flex-basis: 100%; }
+      }
+
       /* Footer */
       .ins-site-footer {
         transition: background-color 320ms ease, color 320ms ease;
