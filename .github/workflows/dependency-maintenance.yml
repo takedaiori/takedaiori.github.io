@@ -16,6 +16,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   gate:
+    if: github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -27,11 +28,11 @@ jobs:
       pr: ${{ steps.policy.outputs.pr }}
       auto: ${{ steps.policy.outputs.auto }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: main
           persist-credentials: false
-      - uses: actions/github-script@v9
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         id: policy
         with:
           script: |
@@ -52,11 +53,11 @@ jobs:
       BUILD_PREFETCH_ENABLED: 'false'
       STATIC_PAGE_GENERATION_TIMEOUT: '600'
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ needs.gate.outputs.sha }}
           persist-credentials: false
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: '22'
           cache: yarn
@@ -73,7 +74,7 @@ jobs:
     permissions:
       checks: write
     steps:
-      - uses: actions/github-script@v9
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         env:
           HEAD_SHA: ${{ needs.gate.outputs.sha }}
           EXPORT_RESULT: ${{ needs.export.result }}
@@ -86,14 +87,14 @@ jobs:
             });
   merge:
     needs: [gate, export, report]
-    if: needs.gate.outputs.auto == 'true'
+    if: needs.gate.outputs.auto == 'true' && needs.export.result == 'success' && needs.report.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
       actions: write
     steps:
-      - uses: actions/github-script@v9
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         env:
           PR_NUMBER: ${{ needs.gate.outputs.pr }}
           EXPECTED_SHA: ${{ needs.gate.outputs.sha }}

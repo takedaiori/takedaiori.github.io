@@ -11,6 +11,10 @@ const SiteFooter = () => {
           <span>© 2026 · Powered by NotionNext · Hosted with GitHub Pages</span>
         </div>
       </a>
+      <nav className='ins-footer-notices' aria-label='站点声明'>
+        <a href='/content-rights.html'>内容与许可</a>
+        <a href='/privacy.html'>隐私说明</a>
+      </nav>
     </footer>
   )
 }

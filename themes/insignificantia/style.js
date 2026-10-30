@@ -563,6 +563,17 @@ export const Style = () => {
         flex-wrap: wrap;
       }
 
+      .ins-footer-notices {
+        max-width: var(--ins-shell);
+        margin: 0 auto;
+        padding: 0 24px 22px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 22px;
+      }
+      #theme-insignificantia .ins-footer-notices a { color: inherit; }
+      .ins-footer-notices a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+
       /* Footer */
       .ins-site-footer {
         transition: background-color 320ms ease, color 320ms ease;

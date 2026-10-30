@@ -17,6 +17,7 @@ concurrency:
 
 jobs:
   build:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
       NOTION_PAGE_ID: ${{ secrets.NOTION_PAGE_ID }}
@@ -32,12 +33,11 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: "22"
           cache: yarn
@@ -58,7 +58,7 @@ jobs:
       - name: Restore encrypted build cache
         id: build-cache
         if: ${{ !inputs.clean_build && env.HAS_BUILD_CACHE_KEY == 'true' }}
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: .build-cache/cache.enc
           key: pages-encrypted-v1-${{ runner.os }}-${{ hashFiles('yarn.lock', 'next.config.js', 'lib/cache/**', 'lib/db/**', 'scripts/maintenance/encrypted-build-cache.cjs') }}-${{ github.run_id }}-${{ github.run_attempt }}
@@ -85,7 +85,7 @@ jobs:
 
       - name: Save encrypted build cache
         if: ${{ env.HAS_BUILD_CACHE_KEY == 'true' }}
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: .build-cache/cache.enc
           key: pages-encrypted-v1-${{ runner.os }}-${{ hashFiles('yarn.lock', 'next.config.js', 'lib/cache/**', 'lib/db/**', 'scripts/maintenance/encrypted-build-cache.cjs') }}-${{ github.run_id }}-${{ github.run_attempt }}
@@ -93,11 +93,8 @@ jobs:
       - name: Add .nojekyll
         run: touch out/.nojekyll
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v6
-
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v5
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
           path: ./out
 
@@ -113,6 +110,9 @@ jobs:
     needs: build
 
     steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
+
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5
