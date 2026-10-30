@@ -1,6 +1,14 @@
 const SiteFooter = () => {
   return (
     <footer className='ins-site-footer'>
+      {/* Restore the full footer target without nesting the legal links. */}
+      <a
+        className='ins-footer-guide-area'
+        href='/design-guide'
+        data-ins-guide-enter='true'
+        aria-hidden='true'
+        tabIndex={-1}
+      />
       <div className='ins-footer-content'>
         <div className='ins-footer-heading'>
           <a
