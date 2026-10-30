@@ -589,9 +589,21 @@ export const Style = () => {
         z-index: 1;
         pointer-events: none;
       }
-      #theme-insignificantia .ins-footer-brand-link,
+      #theme-insignificantia .ins-footer-brand,
+      #theme-insignificantia .ins-footer-credit,
       #theme-insignificantia .ins-footer-inline-notices a {
         pointer-events: auto;
+      }
+      #theme-insignificantia .ins-footer-brand,
+      #theme-insignificantia .ins-footer-credit {
+        cursor: default;
+      }
+      #theme-insignificantia .ins-footer-guide-area {
+        cursor: pointer;
+      }
+      #theme-insignificantia .ins-footer-guide-area:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: -4px;
       }
 
       .ins-footer-content {
