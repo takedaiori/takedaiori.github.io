@@ -574,6 +574,26 @@ export const Style = () => {
       #theme-insignificantia .ins-footer-notices a { color: inherit; }
       .ins-footer-notices a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 
+      /* The guide target sits below independent, interactive footer links. */
+      #theme-insignificantia .ins-site-footer {
+        position: relative;
+        isolation: isolate;
+      }
+      #theme-insignificantia .ins-footer-guide-area {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+      }
+      #theme-insignificantia .ins-footer-content {
+        position: relative;
+        z-index: 1;
+        pointer-events: none;
+      }
+      #theme-insignificantia .ins-footer-brand-link,
+      #theme-insignificantia .ins-footer-inline-notices a {
+        pointer-events: auto;
+      }
+
       .ins-footer-content {
         max-width: var(--ins-shell);
         margin: auto;
