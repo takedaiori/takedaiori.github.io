@@ -6,13 +6,13 @@
 
 | 项目 / 已核对版本 | 仓库范围或证据 | 许可 | 随站发布的原文 | 上游或发布包依据 |
 |---|---|---|---|---|
-| Font Awesome Free，CSS 标头 6.4.2 / 6.3.0 | public/vendor/fontawesome/css/all.min.css；public/css/all.min.css；相应 public/vendor/fontawesome/webfonts/ 与 public/webfonts/ 字体 | CSS 等代码 MIT；字体 OFL-1.1；上游 SVG/JS 图标形态 CC-BY-4.0（不表示本站所有 SVG 都来自该项目） | [Font Awesome Free 原文](./public/licenses/fontawesome-free-6.3.0-6.4.2.txt) | [6.4.2](https://github.com/FortAwesome/Font-Awesome/blob/6.4.2/LICENSE.txt) / [6.3.0](https://github.com/FortAwesome/Font-Awesome/blob/6.3.0/LICENSE.txt)，两版原文一致 |
-| React 18.3.1 | yarn.lock；核对 npm 18.3.1 发布包 package/LICENSE | MIT | [原文](./public/licenses/react-18.3.1-MIT.txt) | [官方仓库](https://github.com/facebook/react) / [发布包](https://registry.npmjs.org/react/-/react-18.3.1.tgz) |
-| Next.js 15.5.28 | yarn.lock；上游 v15.5.28 license.md | MIT | [原文](./public/licenses/next-15.5.28-MIT.txt) | [版本原文](https://github.com/vercel/next.js/blob/v15.5.28/license.md) |
-| Tabler Icons 3.49.0 | @tabler/icons-react 的锁定版本；上游 v3.49.0 LICENSE | MIT | [原文](./public/licenses/tabler-icons-3.49.0-MIT.txt) | [版本原文](https://github.com/tabler/tabler-icons/blob/v3.49.0/LICENSE) |
-| Typed.js 2.0.12 | public/js/typed.min.js 标头 | MIT | [原文](./public/licenses/typed-js-2.0.12-MIT.txt) | [版本原文](https://github.com/mattboldt/typed.js/blob/v2.0.12/LICENSE.txt) |
-| animate.css 3.7.2 | public/css/wow/animate.css 标头（本站文件注明适配 wowjs） | MIT；修改仍须保留原版权和许可 | [原文](./public/licenses/animate-css-3.7.2-MIT.txt) | [版本原文](https://github.com/animate-css/animate.css/blob/3.7.2/LICENSE) |
-| remixicon-react 1.0.0 | 锁定发布包；元数据与 package/LICENSE | MIT AND OFL-1.1（发布包声明）；具体材料范围见原文 | [原文](./public/licenses/remixicon-react-1.0.0.txt) | [该版本发布包](https://registry.npmjs.org/remixicon-react/-/remixicon-react-1.0.0.tgz)，其元数据仓库为 bayesimpact/remixicon-react；不以最新 RemixIcon 同名项目许可替换它 |
+| Font Awesome Free，CSS 标头 6.4.2 / 6.3.0 | public/vendor/fontawesome/css/all.min.css；public/css/all.min.css；相应 public/vendor/fontawesome/webfonts/ 与 public/webfonts/ 字体 | CSS 等代码 MIT；字体 OFL-1.1；上游 SVG/JS 图标形态 CC-BY-4.0（不表示本站所有 SVG 都来自该项目） | [Font Awesome Free 原文](./public/licenses/fontawesome-free-6.3.0-6.4.2.md) | [6.4.2](https://github.com/FortAwesome/Font-Awesome/blob/6.4.2/LICENSE.txt) / [6.3.0](https://github.com/FortAwesome/Font-Awesome/blob/6.3.0/LICENSE.txt)，两版原文一致 |
+| React 18.3.1 | yarn.lock；核对 npm 18.3.1 发布包 package/LICENSE | MIT | [原文](./public/licenses/react-18.3.1-MIT.md) | [官方仓库](https://github.com/facebook/react) / [发布包](https://registry.npmjs.org/react/-/react-18.3.1.tgz) |
+| Next.js 15.5.28 | yarn.lock；上游 v15.5.28 license.md | MIT | [原文](./public/licenses/next-15.5.28-MIT.md) | [版本原文](https://github.com/vercel/next.js/blob/v15.5.28/license.md) |
+| Tabler Icons 3.49.0 | @tabler/icons-react 的锁定版本；上游 v3.49.0 LICENSE | MIT | [原文](./public/licenses/tabler-icons-3.49.0-MIT.md) | [版本原文](https://github.com/tabler/tabler-icons/blob/v3.49.0/LICENSE) |
+| Typed.js 2.0.12 | public/js/typed.min.js 标头 | MIT | [原文](./public/licenses/typed-js-2.0.12-MIT.md) | [版本原文](https://github.com/mattboldt/typed.js/blob/v2.0.12/LICENSE.txt) |
+| animate.css 3.7.2 | public/css/wow/animate.css 标头（本站文件注明适配 wowjs） | MIT；修改仍须保留原版权和许可 | [原文](./public/licenses/animate-css-3.7.2-MIT.md) | [版本原文](https://github.com/animate-css/animate.css/blob/3.7.2/LICENSE) |
+| remixicon-react 1.0.0 | 锁定发布包；元数据与 package/LICENSE | MIT AND OFL-1.1（发布包声明）；具体材料范围见原文 | [原文](./public/licenses/remixicon-react-1.0.0.md) | [该版本发布包](https://registry.npmjs.org/remixicon-react/-/remixicon-react-1.0.0.tgz)，其元数据仓库为 bayesimpact/remixicon-react；不以最新 RemixIcon 同名项目许可替换它 |
 | GSAP 3.15.0 | yarn.lock；核对该版本 npm 元数据的 license 字段 | Standard “No Charge” GSAP License；专用许可，不标为 MIT 或 OSI 开源许可 | 发布包未附独立 LICENSE；参阅右侧官方条款，而非添加本站自拟的替代许可证 | [官方条款](https://gsap.com/community/standard-license/) / [版本元数据](https://registry.npmjs.org/gsap/3.15.0) |
 
 ## 复用及维护要求
