@@ -31,6 +31,6 @@
 
 感谢 NotionNext 及其上游项目的作者与贡献者，让这个个人博客有了可以继续搭建的基础。
 
-项目代码许可见 [LICENSE](./LICENSE)。文章、游戏摄影及个人标识的使用边界见[内容与许可说明](./CONTENT-RIGHTS.md)；访问数据与浏览器存储说明见[隐私说明](./PRIVACY.md)。
+项目代码许可见 [LICENSE](./LICENSE)，第三方组件、字体及图标的具体范围与原文见[第三方许可索引](./THIRD-PARTY-NOTICES.md)。文章、游戏摄影及个人标识的使用边界见[内容与许可说明](./CONTENT-RIGHTS.md)；访问数据与浏览器存储说明见[隐私说明](./PRIVACY.md)。
 
 网站阅读版：[内容与许可](https://takedaiori.github.io/content-rights.html) · [隐私说明](https://takedaiori.github.io/privacy.html)。
