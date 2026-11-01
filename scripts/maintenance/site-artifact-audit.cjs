@@ -3,7 +3,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 const textTypes = new Set(['.html', '.js', '.json', '.css', '.xml', '.txt', '.map', '.svg'])
 const patterns = [
-  ['private-key', /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----[\r\n]+[A-Za-z0-9+/=\r\n]{64,}/],
+  ['private-key', /-----BEGIN (?:RSA |EC |OPENSSH |ENCRYPTED )?PRIVATE KEY-----[\r\n]+[A-Za-z0-9+/=\r\n]{64,}/],
   ['github-token', /(?:gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{60,})/],
   ['openai-project-key', /sk-proj-[A-Za-z0-9_-]{40,}/]
 ]
@@ -24,7 +24,7 @@ function audit(root, baseline, secrets = []) {
       groups[group] = (groups[group] || 0) + bytes
       if (!textTypes.has(path.extname(rel))) continue
       const text = fs.readFileSync(full, 'utf8')
-      for (const [rule, pattern] of patterns) if (pattern.test(text)) findings.push({ file: rel, rule })
+      for (const [rule, pattern] of patterns) if (pattern.test(rule === 'private-key' ? text.replace(/\\r\\n|\\n|\\r/g, '\n') : text)) findings.push({ file: rel, rule })
       if (secrets.some(secret => secret.length >= 20 && text.includes(secret))) findings.push({ file: rel, rule: 'configured-secret' })
       if (rel.endsWith('.html')) {
         for (const match of text.matchAll(/<script\b[^>]*\bsrc\s*=\s*["'](https?:\/\/[^"']+)["']/gi)) {

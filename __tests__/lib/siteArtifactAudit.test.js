@@ -39,3 +39,10 @@ test('dependency review blocks added high/critical issues but not removals or mo
     { change_type: 'added', name: 'new', version: '1', vulnerabilities: [{ severity: 'high', advisory_ghsa_id: 'GHSA-example' }, { severity: 'moderate' }] }
   ])).toEqual([{ name: 'new', version: '1', severity: 'high', advisory: 'GHSA-example' }])
 })
+
+
+test('recognizes private keys serialized with JSON newline escapes', () => {
+  const key = '-----BEGIN ' + 'PRIVATE KEY-----\n' + 'A'.repeat(80) + '\n-----END PRIVATE KEY-----'
+  put('data.json', JSON.stringify({ key }))
+  expect(audit(root, null).findings).toEqual([{ file: 'data.json', rule: 'private-key' }])
+})
