@@ -75,6 +75,12 @@ jobs:
                       raise ValueError('Unsafe public artifact entry')
               t.extractall('.tmp/pruning-baseline', filter='data')
           PYTHON
+      - name: Install CJK fonts for realistic browser screenshots
+        if: ${{ hashFiles('pruning-plan.json') != '' }}
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y fonts-noto-cjk
+          fc-match :lang=zh-cn
       - name: Simulate resource removal and check browser behavior
         if: ${{ hashFiles('pruning-plan.json') != '' }}
         run: node scripts/maintenance/pruning-browser-smoke.cjs
