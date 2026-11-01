@@ -46,3 +46,12 @@ test('recognizes private keys serialized with JSON newline escapes', () => {
   put('data.json', JSON.stringify({ key }))
   expect(audit(root, null).findings).toEqual([{ file: 'data.json', rule: 'private-key' }])
 })
+
+
+test('redacts credential-bearing filenames from both findings and size inventory', () => {
+  const secret = 'fixture-' + 'q'.repeat(40)
+  put(secret + '.html', 'Public content')
+  const report = audit(root, null, [secret])
+  expect(report.findings[0].rule).toBe('credential-in-path')
+  expect(JSON.stringify(report)).not.toContain(secret)
+})
