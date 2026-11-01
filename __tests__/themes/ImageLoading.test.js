@@ -109,3 +109,32 @@ test('waits for full image decoding and rejects stale completions after a source
   await waitFor(() => expect(host).toHaveAttribute('data-ins-image-group', 'error'))
   expect(host).not.toHaveClass('ins-image-loading')
 })
+
+test('reveals ready text while an offscreen image is pending, preserving lazy loading', async () => {
+  jest.useFakeTimers()
+  try {
+    window.__insInitialImagesPending = true
+    document.documentElement.classList.add('ins-initial-loading')
+    const { container } = render(
+      <div id='theme-insignificantia'>
+        <header className='ins-site-header'>Navigation</header>
+        <div className='ins-page-shell'><main>
+          <p>Ready article text</p>
+          <img src='/slow.webp' loading='lazy' alt='slow' />
+        </main></div>
+      </div>
+    )
+    const image = container.querySelector('img')
+    mockImage(image)
+    installController()
+    await act(async () => { jest.advanceTimersByTime(250) })
+    expect(document.documentElement).not.toHaveClass('ins-initial-loading')
+    expect(image.loading || image.getAttribute('loading')).toBe('lazy')
+    expect(image).toHaveAttribute('data-ins-image-state', 'pending')
+    expect(container.querySelector('header')).toHaveTextContent('Navigation')
+    await expect(window.InsignificantiaImages.initialReady).resolves.toBeUndefined()
+  } finally {
+    window.InsignificantiaImages?.destroy()
+    jest.useRealTimers()
+  }
+})
