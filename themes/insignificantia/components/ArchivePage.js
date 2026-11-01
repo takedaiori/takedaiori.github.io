@@ -86,6 +86,14 @@ const ArchivePage = props => {
       ? props.posts
       : []
 
+  if (selectedYear && !props.archiveYear && props.archiveYears) {
+    return (
+      <main role='status' aria-busy='true' style={{ minHeight: '60vh', display: 'grid', placeItems: 'center', color: 'var(--ins-pink, #ed8eac)' }}>
+        <Link href={yearPageHref(selectedYear, Number(router.query.p) > 0 ? Math.floor(Number(router.query.p)) : 1)} prefetch={false}>LOADING…</Link>
+      </main>
+    )
+  }
+
   if (selectedYear) {
     const filteredPosts = props.archiveYear ? posts : posts.filter(
       post => extractYear(post) === selectedYear
