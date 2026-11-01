@@ -54,12 +54,9 @@
     if (!initial || released) return
     clearTimeout(quietTimer)
     if (!contentReady()) return
-    var pending = Array.from(images).some(function (item) { return item[0].isConnected && item[1].status === 'pending' })
-    if (pending) return
-    // Theme chunks may insert their images just after the shell mounts.
+    // Text and navigation must not wait for remote or offscreen images.
     quietTimer = setTimeout(function () {
       if (!contentReady()) return
-      if (Array.from(images).some(function (item) { return item[0].isConnected && item[1].status === 'pending' })) return
       release('complete')
     }, 200)
   }
@@ -82,7 +79,6 @@
       state.status = 'pending'
       image.setAttribute('data-ins-image-state', 'pending')
     }
-    if (initial && image.loading !== 'eager') image.loading = 'eager'
     if (image.classList.contains('lazy-image-placeholder') || !image.complete) {
       state.status = 'pending'
       image.setAttribute('data-ins-image-state', 'pending')
@@ -193,7 +189,7 @@
     resolveInitial()
   }
   window.InsignificantiaImages = { initialReady: initialReady, scan: scan, destroy: destroy }
-  if (initial) releaseTimer = setTimeout(function () { release('timeout') }, 12000)
+  if (initial) releaseTimer = setTimeout(function () { release('timeout') }, 4000)
   else { released = true; resolveInitial() }
   scan()
 })()

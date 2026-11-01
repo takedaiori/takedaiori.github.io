@@ -1,3 +1,4 @@
+import { compactListPageData } from '@/lib/utils/listPageData'
 import BLOG from '@/blog.config'
 import { siteConfig } from '@/lib/config'
 import { fetchGlobalAllData } from '@/lib/db/SiteDataApi'
@@ -37,7 +38,7 @@ export async function getStaticProps({ params: { category, page } }) {
   props = { ...props, category, page }
 
   return {
-    props,
+    props: compactListPageData(props, siteConfig('THEME', BLOG.THEME, props.NOTION_CONFIG)),
     revalidate: process.env.EXPORT
       ? undefined
       : siteConfig(
