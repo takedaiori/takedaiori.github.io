@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "baselineCommit": "6ae5e7d9953677acc87a63ea7a7c42aa353c0c2e",
+  "dependencies": [
+    "@headlessui/react",
+    "@tabler/icons-react",
+    "gsap",
+    "remixicon-react",
+    "@ai-sdk/google",
+    "@ai-sdk/vue",
+    "ai"
+  ],
+  "assets": [
+    {
+      "path": "public/videos/video.mp4",
+      "bytes": 2790943,
+      "sha256": "293cf0e8d88009c810b2b0dfb9df06e478ec8780c2d84d675bfa9d26758f876c"
+    },
+    {
+      "path": "public/css/all.min.css",
+      "bytes": 102025,
+      "sha256": "ff8510712984ac3ccf08c022b8e8963d556c34ddacdd963f36c99735c8f42057"
+    },
+    {
+      "path": "public/webfonts/fa-brands-400.ttf",
+      "bytes": 187448,
+      "sha256": "2ef6fdde707193e437c22753755cb32fb8921dde7ff67439b58e6dca3c5a0bef"
+    },
+    {
+      "path": "public/webfonts/fa-brands-400.woff2",
+      "bytes": 108000,
+      "sha256": "f461742308b7791fee6e9698e1212aa6e8fd1d5e5b41795bfd68e93aa011073d"
+    },
+    {
+      "path": "public/webfonts/fa-solid-900.ttf",
+      "bytes": 394832,
+      "sha256": "67a880b4ba529b9acc303d729b56b4fd7086fb22d425660410b8c51e1784f629"
+    },
+    {
+      "path": "public/webfonts/fa-regular-400.ttf",
+      "bytes": 63728,
+      "sha256": "12dea17b68aafb3f43ca81628a01b33fed73d9bbd434dbd2bc8512bcff0534a6"
+    },
+    {
+      "path": "public/webfonts/fa-v4compatibility.woff2",
+      "bytes": 4536,
+      "sha256": "7c377405b7e79354546bdddb7dcd73bd38760c95c2be44ea1e3097582dac642c"
+    },
+    {
+      "path": "public/webfonts/fa-regular-400.woff2",
+      "bytes": 24840,
+      "sha256": "7ba24c4138c4c3cfe694a8fc8943b8ce21b9bfbb14edcb290b8654fcaa365d6b"
+    },
+    {
+      "path": "public/webfonts/fa-solid-900.woff2",
+      "bytes": 149908,
+      "sha256": "e2c5cf547e2e8d74a17d05c5ad9f1f593ca526452e228124294fa983b908ff82"
+    },
+    {
+      "path": "public/webfonts/fa-v4compatibility.ttf",
+      "bytes": 10172,
+      "sha256": "8d9500e8440179eb4187f339e0b1a2e84a0f298a899250e6ac6d218b6e5a407f"
+    },
+    {
+      "path": "public/images/feature-1.webp",
+      "bytes": 27608,
+      "sha256": "4200c449d38f012535546475d5346075e6d53ea43053f4717e65c47b62d3e512"
+    },
+    {
+      "path": "public/images/feature-2.webp",
+      "bytes": 21100,
+      "sha256": "a69b08508067b7f8cd195b65fdf45aceb66c7543c8f8039cacb2c2db5750157f"
+    },
+    {
+      "path": "public/images/feature-3.webp",
+      "bytes": 121468,
+      "sha256": "b3a6d1dab7bc4b0924a5e4c77becb16e7ef087d4aeaa039c1a901cd798dd8580"
+    },
+    {
+      "path": "public/images/features-bg.png",
+      "bytes": 45632,
+      "sha256": "98e1ab2d6ac1f86941b2e24b3e52c95cd31f4694629bc6343fd3b1bd3b088d55"
+    },
+    {
+      "path": "public/images/features-element.png",
+      "bytes": 7244,
+      "sha256": "02cc9453ee73eed0075758162cc24e40bea243c1ef37273fc0c74322f867e9a2"
+    },
+    {
+      "path": "public/images/hero-image.png",
+      "bytes": 27106,
+      "sha256": "0b1780cedab1d48c0e1725400a9493e686c56e01c67ee8f5bd043c0e91384092"
+    },
+    {
+      "path": "public/images/home.png",
+      "bytes": 74988,
+      "sha256": "d95773415693ac41452329b7a87ae5e6fe3a630d0e1be24d6fb2f01e1d077125"
+    },
+    {
+      "path": "public/images/testimonial.jpg",
+      "bytes": 5210,
+      "sha256": "f61e1a06b5edcfd0f2b50f94ec6a1cc4dad7a4e916d4430d433069629ed50052"
+    }
+  ]
+}
