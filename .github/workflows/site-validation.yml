@@ -1,0 +1,57 @@
+name: Site export validation
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'lib/db/**'
+      - 'lib/utils/articlePageData.js'
+      - 'scripts/maintenance/site-artifact-audit.cjs'
+      - '.github/workflows/deploy-pages.yml'
+      - '.github/workflows/site-validation.yml'
+permissions:
+  contents: read
+concurrency:
+  group: site-validation-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  export:
+    name: Full site export & artifact scan
+    # Only owner-authored branches in this repository may use the data-source
+    # credential. Forks and other authors never receive this build context.
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.user.login == github.repository_owner
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      NOTION_PAGE_ID: ${{ secrets.NOTION_PAGE_ID }}
+      NEXT_PUBLIC_THEME: insignificantia
+      NEXT_PUBLIC_THEME_SWITCH: 'false'
+      NEXT_PUBLIC_WIDGET_PET: 'false'
+      NEXT_PUBLIC_WIDGET_PET_SWITCH_THEME: 'false'
+      NEXT_PUBLIC_POSTS_PER_PAGE: '15'
+      NEXT_PUBLIC_LINK: https://takedaiori.github.io
+      BUILD_PREFETCH_ENABLED: 'false'
+      STATIC_PAGE_GENERATION_TIMEOUT: '600'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: '22'
+          cache: yarn
+      - run: npm install -g yarn@1.22.22
+      - run: yarn install --frozen-lockfile
+      - name: Validate published data source
+        run: test -n "$NOTION_PAGE_ID"
+      - name: Export and scan without publishing
+        run: |
+          yarn export
+          yarn perf:page-data
+          node scripts/maintenance/site-artifact-audit.cjs
+      - name: Save validation report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: pr-site-audit
+          path: .perf/site-audit-report.json
+          retention-days: 7
+          if-no-files-found: error
