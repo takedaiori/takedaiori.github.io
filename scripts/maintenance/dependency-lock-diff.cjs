@@ -16,7 +16,8 @@ function lockEntries(text) {
     const selector = match?.[1] || match?.[2]
     const version = /^  version "([^"]+)"/m.exec(block)?.[1]
     if (!selector || !version || !selector.includes('@')) throw Error('Unsupported dependency entry')
-    const name = selector.slice(0, selector.lastIndexOf('@'))
+    const requestedName = selector.slice(0, selector.lastIndexOf('@'))
+    const name = requestedName.includes('@npm:') ? requestedName.slice(requestedName.indexOf('@npm:') + 5) : requestedName
     return { name, version, block }
   })
 }
@@ -31,7 +32,7 @@ function compareLocks(baseManifest, headManifest, baseLock, headLock) {
   const originalVersions = new Set(base.map(entry => entry.name + '@' + entry.version))
   const added = [...new Map(head.filter(entry => !originalVersions.has(entry.name + '@' + entry.version))
     .map(entry => [entry.name + '@' + entry.version, { name: entry.name, version: entry.version }])).values()]
-  const unverifiedAdded = head.filter(entry => !originalVersions.has(entry.name + '@' + entry.version) && !/^  resolved "https:\/\/registry\.(?:npmjs\.org|yarnpkg\.com|npmmirror\.com)\//m.test(entry.block)).map(entry => entry.name)
+  const unverifiedAdded = head.filter(entry => !originalVersions.has(entry.name + '@' + entry.version) && (!/^(?:@[a-z0-9._-]+\/)?[a-z0-9._-]+$/i.test(entry.name) || !/^  resolved "https:\/\/registry\.(?:npmjs\.org|yarnpkg\.com|npmmirror\.com)\//m.test(entry.block))).map(entry => entry.name)
   return { removalOnly, added, unverifiedAdded, removedEntries: base.length - head.length }
 }
 module.exports = { lockEntries, compareLocks }

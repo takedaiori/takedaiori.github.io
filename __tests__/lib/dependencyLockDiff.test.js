@@ -51,3 +51,10 @@ test('OSV failure cannot be reported as a clean scan', async () => {
   global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 503 })
   await expect(review(fixture())).rejects.toThrow('OSV query failed: 503')
 })
+
+test('npm aliases are audited under the real package name, not the local alias', () => {
+  const alias = 'one-cjs@npm:one@^1:\n  version "1.0.0"\n  resolved "https://registry.npmjs.org/one/-/one-1.0.0.tgz"\n'
+  const result = compareLocks({ dependencies: {} }, { dependencies: { 'one-cjs': 'npm:one@^1' } }, two, alias)
+  expect(result.added).toEqual([{ name: 'one', version: '1.0.0' }])
+  expect(result.unverifiedAdded).toEqual([])
+})
