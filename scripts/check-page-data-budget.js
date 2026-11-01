@@ -81,6 +81,10 @@ function main() {
   )
 
   const listFailures = pages.filter(page => page.listOverLimit)
+  // Always identify blockers even when large article pages fill the top 20.
+  for (const page of listFailures) {
+    console.error(`::error::List page ${page.route}: ${page.kb} KiB exceeds ${listFailBudgetKb} KiB`)
+  }
   for (const page of pages.filter(page => page.overBudget)) {
     console.log(`::warning::Page data ${page.route}: ${page.kb} KiB (warning budget ${warnBudgetKb} KiB)`)
   }

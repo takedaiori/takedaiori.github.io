@@ -1,3 +1,4 @@
+import { compactListPageData } from '@/lib/utils/listPageData'
 import BLOG from '@/blog.config'
 import { siteConfig } from '@/lib/config'
 import { fetchGlobalAllData } from '@/lib/db/SiteDataApi'
@@ -22,7 +23,7 @@ export async function getStaticProps(req) {
   const props = await fetchGlobalAllData({ from, locale })
   delete props.allPages
   return {
-    props,
+    props: compactListPageData(props, siteConfig('THEME', BLOG.THEME, props.NOTION_CONFIG), siteConfig('CUSTOM_RIGHT_CLICK_CONTEXT_MENU', false, props.NOTION_CONFIG)),
     revalidate: process.env.EXPORT
       ? undefined
       : siteConfig(
