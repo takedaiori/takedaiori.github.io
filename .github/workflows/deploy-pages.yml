@@ -3,6 +3,10 @@ name: Deploy NotionNext to GitHub Pages
 on:
   workflow_dispatch:
     inputs:
+      validate_only:
+        description: Build and scan without publishing Pages
+        type: boolean
+        default: false
       clean_build:
         description: Ignore previous build cache
         type: boolean
@@ -19,6 +23,9 @@ jobs:
   build:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     env:
       NOTION_PAGE_ID: ${{ secrets.NOTION_PAGE_ID }}
       NEXT_PUBLIC_THEME: insignificantia
@@ -83,6 +90,41 @@ jobs:
           PERF_LIST_DATA_FAIL_KB: "256"
         run: yarn perf:page-data
 
+      - name: Restore previous successful size report
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        with:
+          script: |
+            await require('./scripts/maintenance/restore-site-baseline.cjs')({github, context, core})
+
+      - name: Read baseline data without extracting files
+        run: |
+          python - <<'PYTHON'
+          import json, pathlib, zipfile
+          archive = pathlib.Path('.perf/baseline.zip')
+          if archive.exists():
+              with zipfile.ZipFile(archive) as z:
+                  info = z.getinfo('site-audit-report.json')
+                  if info.file_size > 10 * 1024 * 1024:
+                      raise ValueError('Baseline report is unexpectedly large')
+                  data = json.loads(z.read(info))
+                  if data.get('schema') != 1:
+                      raise ValueError('Unsupported baseline schema')
+                  pathlib.Path('.perf/baseline.json').write_text(json.dumps(data))
+          PYTHON
+
+      - name: Scan publish output and report site size changes
+        env:
+          SCAN_SECRET_BUILD_CACHE_KEY: ${{ secrets.BUILD_CACHE_KEY }}
+        run: node scripts/maintenance/site-artifact-audit.cjs
+
+      - name: Save size and scan report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: site-audit-report
+          path: .perf/site-audit-report.json
+          retention-days: 30
+          if-no-files-found: error
+
       - name: Encrypt successful build cache
         if: ${{ env.HAS_BUILD_CACHE_KEY == 'true' }}
         env:
@@ -105,6 +147,7 @@ jobs:
           path: ./out
 
   deploy:
+    if: ${{ !inputs.validate_only }}
     permissions:
       contents: read
       pages: write

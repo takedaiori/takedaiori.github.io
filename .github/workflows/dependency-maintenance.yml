@@ -1,7 +1,7 @@
 name: Dependency maintenance
 on:
   workflow_run:
-    workflows: [CI, CodeQL]
+    workflows: [CI, CodeQL, Dependency review]
     types: [completed]
   workflow_dispatch:
     inputs:
@@ -67,6 +67,8 @@ jobs:
         run: test -n "$NOTION_PAGE_ID"
       - name: Full static export
         run: yarn export
+      - name: Scan exported public files
+        run: node scripts/maintenance/site-artifact-audit.cjs
   report:
     needs: [gate, export]
     if: ${{ always() && needs.gate.outputs.eligible == 'true' }}
