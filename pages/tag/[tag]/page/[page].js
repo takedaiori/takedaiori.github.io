@@ -29,7 +29,7 @@ export async function getStaticProps({ params: { tag, page }, locale }) {
   props.page = page
   delete props.allPages
   return {
-    props: compactListPageData(props, siteConfig('THEME', BLOG.THEME, props.NOTION_CONFIG)),
+    props: compactListPageData(props, siteConfig('THEME', BLOG.THEME, props.NOTION_CONFIG), siteConfig('CUSTOM_RIGHT_CLICK_CONTEXT_MENU', false, props.NOTION_CONFIG)),
     revalidate: process.env.EXPORT
       ? undefined
       : siteConfig(

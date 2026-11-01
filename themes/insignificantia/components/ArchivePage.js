@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { postYear } from '@/lib/utils/readingNavigation'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import { yearPageHref } from '@/lib/utils/archivePagination'
 import ArticleListPage from './ArticleListPage'
 
 const normalizeOption = option => {
@@ -55,6 +57,7 @@ const renderCategory = (option, index) => {
               href={`/category/${encodeURIComponent(
                 category.name
               )}`}
+              prefetch={false}
               className='ins-archive-card'>
               <strong>{category.name}</strong>
               {category.count !== '' && (
@@ -66,9 +69,16 @@ const renderCategory = (option, index) => {
 
 const ArchivePage = props => {
   const router = useRouter()
-  const selectedYear = router?.query?.year
+  const selectedYear = props.archiveYear || (router?.query?.year
     ? String(router.query.year)
-    : ''
+    : '')
+
+  useEffect(() => {
+    if (props.archiveYear || !router.isReady || !selectedYear) return
+    const requested = Number(router.query.p || 1)
+    const page = Number.isInteger(requested) && requested > 0 ? requested : 1
+    router.replace(yearPageHref(selectedYear, page))
+  }, [props.archiveYear, router, selectedYear])
 
   const posts = Array.isArray(props?.archivePosts)
     ? props.archivePosts
@@ -77,7 +87,7 @@ const ArchivePage = props => {
       : []
 
   if (selectedYear) {
-    const filteredPosts = posts.filter(
+    const filteredPosts = props.archiveYear ? posts : posts.filter(
       post => extractYear(post) === selectedYear
     )
 
@@ -85,15 +95,11 @@ const ArchivePage = props => {
       <ArticleListPage
         {...props}
         posts={filteredPosts}
-        postCount={filteredPosts.length}
+        postCount={props.archiveYear ? props.postCount : filteredPosts.length}
         kicker='ARCHIVE RESULT'
         contextLabel='YEAR'
         contextValue={selectedYear}
-        makePageHref={pageNumber =>
-          `/archive?year=${encodeURIComponent(
-            selectedYear
-          )}&p=${pageNumber}`
-        }
+        makePageHref={pageNumber => yearPageHref(selectedYear, pageNumber)}
       />
     )
   }
@@ -102,7 +108,7 @@ const ArchivePage = props => {
     ? [...props.categoryOptions].sort(categorySort)
     : []
 
-  const years = [
+  const years = props.archiveYears ? props.archiveYears.map(item => item.year) : [
     ...new Set(
       posts
         .map(extractYear)
@@ -143,7 +149,8 @@ const ArchivePage = props => {
         {years.map(year => (
           <Link
             key={year}
-            href={`/archive?year=${year}`}
+            href={yearPageHref(year)}
+            prefetch={false}
             className='ins-archive-card'>
             <strong>{year}</strong>
             <small>YEAR</small>

@@ -77,6 +77,12 @@ jobs:
           yarn export
           echo "Static export: $((SECONDS-started)) seconds" >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Check page data budget
+        env:
+          PERF_PAGE_DATA_WARN_KB: "128"
+          PERF_LIST_DATA_FAIL_KB: "256"
+        run: yarn perf:page-data
+
       - name: Encrypt successful build cache
         if: ${{ env.HAS_BUILD_CACHE_KEY == 'true' }}
         env:

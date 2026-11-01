@@ -4,6 +4,7 @@ import { siteConfig } from '@/lib/config'
 import { fetchGlobalAllData } from '@/lib/db/SiteDataApi'
 import { isBrowser } from '@/lib/utils'
 import { formatDateFmt } from '@/lib/utils/formatDate'
+import { archiveYears, publishedPosts } from '@/lib/utils/archivePagination'
 import { DynamicLayout } from '@/themes/theme'
 import { useEffect } from 'react'
 
@@ -33,34 +34,23 @@ const ArchiveIndex = props => {
 
 export async function getStaticProps({ locale }) {
   const props = await fetchGlobalAllData({ from: 'archive-index', locale })
-  // 处理分页
-  props.posts = props.allPages?.filter(
-    page => page.type === 'Post' && page.status === 'Published'
-  )
-  delete props.allPages
-
-  const postsSortByDate = [...props.posts]
-
-  postsSortByDate.sort((a, b) => {
-    return b?.publishDate - a?.publishDate
-  })
-
-  const archivePosts = {}
-
-  postsSortByDate.forEach(post => {
-    const date = formatDateFmt(post.publishDate, 'yyyy-MM')
-    if (archivePosts[date]) {
-      archivePosts[date].push(post)
-    } else {
-      archivePosts[date] = [post]
-    }
-  })
-
-  props.archivePosts = archivePosts
+  const posts = publishedPosts(props.allPages)
+  if (siteConfig('THEME', BLOG.THEME, props.NOTION_CONFIG) === 'insignificantia') {
+    props.archiveYears = archiveYears(posts)
+    props.posts = []
+  } else {
+    props.posts = posts
+    props.archivePosts = posts.reduce((groups, post) => {
+      const month = formatDateFmt(post.publishDate, 'yyyy-MM')
+      if (!groups[month]) groups[month] = []
+      groups[month].push(post)
+      return groups
+    }, {})
+  }
   delete props.allPages
 
   return {
-    props: compactListPageData(props, siteConfig('THEME', BLOG.THEME, props.NOTION_CONFIG)),
+    props: compactListPageData(props, siteConfig('THEME', BLOG.THEME, props.NOTION_CONFIG), siteConfig('CUSTOM_RIGHT_CLICK_CONTEXT_MENU', false, props.NOTION_CONFIG)),
     revalidate: process.env.EXPORT
       ? undefined
       : siteConfig(
