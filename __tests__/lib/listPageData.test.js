@@ -10,9 +10,19 @@ test('keeps list presentation, year filtering and links without duplicating arch
   expect(result).toMatchObject({ page: 2, postCount: 45, category: 'WPD Archive' })
   expect(result.archivePosts).toBeUndefined()
   expect(result.posts[0].blockMap).toBeUndefined()
-  expect(result.allNavPages[0]).toEqual({ id: 'one', title: 'One', slug: 'article/one', href: '/article/one' })
-  expect(result.allLinkPages).toBe(props.allLinkPages)
+  expect(result.allNavPages).toEqual([])
+  expect(compactListPageData(props, 'insignificantia', true).allNavPages[0].href).toBe('/article/one')
+  expect(result.allLinkPages).toEqual([])
   expect(props.archivePosts).toBeDefined()
   expect(post.blockMap).toBeDefined()
   expect(compactListPageData(props, 'other')).toBe(props)
+})
+
+
+test('keeps notice link destinations while excluding unrelated site links', () => {
+  const props = { notice: { href: '/aabbccddeeff00112233445566778899' }, allLinkPages: [
+    { id: 'aabbccdd-eeff-0011-2233-445566778899', href: '/article/notice-target' },
+    { id: 'other', href: '/article/other' }
+  ] }
+  expect(compactListPageData(props, 'insignificantia').allLinkPages).toEqual([props.allLinkPages[0]])
 })

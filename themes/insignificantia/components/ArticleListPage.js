@@ -187,6 +187,7 @@ const ArticleListPage = ({
               `${post.title}-${index}`
             }
             href={readingHref(getHref(post), readingContext)}
+            prefetch={false}
             className='ins-article-list-card'
             aria-label={`阅读：${
               post?.title || 'Untitled'
@@ -243,6 +244,7 @@ const ArticleListPage = ({
                 <Link
                   key={pageNumber}
                   href={pageHref(pageNumber)}
+                  prefetch={false}
                   aria-current={
                     pageNumber === currentPage
                       ? 'page'

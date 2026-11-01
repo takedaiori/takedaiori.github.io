@@ -2,11 +2,13 @@ const fs = require('fs')
 const path = require('path')
 
 const projectRoot = path.resolve(__dirname, '..')
-const pagesDir = path.join(projectRoot, '.next', 'server', 'pages')
-const reportDir = path.join(projectRoot, '.perf')
+const pagesDir = process.env.PERF_PAGE_DATA_DIR || path.join(projectRoot, '.next', 'server', 'pages')
+const reportDir = process.env.PERF_REPORT_DIR || path.join(projectRoot, '.perf')
 const reportFile = path.join(reportDir, 'page-data-budget.json')
 const warnBudgetKb = Number(process.env.PERF_PAGE_DATA_WARN_KB || 128)
 const failOnBudget = process.env.PERF_PAGE_DATA_FAIL === 'true'
+const listFailBudgetKb = Number(process.env.PERF_LIST_DATA_FAIL_KB || 256)
+const isListRoute = route => /^\/(archive|category|tag)(\/|$)/.test(route) || /^\/page\/\d+$/.test(route)
 
 function walkJsonFiles(dir) {
   if (!fs.existsSync(dir)) return []
@@ -50,7 +52,8 @@ function main() {
         route: routeFromFile(file),
         bytes,
         kb: formatKb(bytes),
-        overBudget: bytes > warnBudgetKb * 1024
+        overBudget: bytes > warnBudgetKb * 1024,
+        listOverLimit: isListRoute(routeFromFile(file)) && bytes > listFailBudgetKb * 1024
       }
     })
     .sort((a, b) => b.bytes - a.bytes)
@@ -58,6 +61,7 @@ function main() {
   const report = {
     generatedAt: new Date().toISOString(),
     warnBudgetKb,
+    listFailBudgetKb,
     totalPages: pages.length,
     overBudgetPages: pages.filter(page => page.overBudget).length,
     largestPages: pages.slice(0, 20),
@@ -76,10 +80,17 @@ function main() {
     }))
   )
 
-  if (failOnBudget && report.overBudgetPages > 0) {
-    console.error(
-      `${report.overBudgetPages} page-data files exceed ${warnBudgetKb}KB.`
-    )
+  const listFailures = pages.filter(page => page.listOverLimit)
+  for (const page of pages.filter(page => page.overBudget)) {
+    console.log(`::warning::Page data ${page.route}: ${page.kb} KiB (warning budget ${warnBudgetKb} KiB)`)
+  }
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    const rows = pages.slice(0, 20).map(page => `| ${page.route.replace(/\|/g, '%7C')} | ${page.kb} | ${page.listOverLimit ? 'OVER LIMIT' : page.overBudget ? 'Warning' : 'OK'} |`)
+    fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+      `\n### Page data budget\n\n${pages.length} pages checked. Warning: ${warnBudgetKb} KiB; list hard limit: ${listFailBudgetKb} KiB.\n\n| Route | KiB | Result |\n| --- | ---: | --- |\n${rows.join('\n')}\n`)
+  }
+  if (listFailures.length || (failOnBudget && report.overBudgetPages > 0)) {
+    console.error(`::error::Page data budget exceeded: ${listFailures.length} list pages above ${listFailBudgetKb} KiB. Report: ${reportFile}`)
     process.exit(1)
   }
 }
