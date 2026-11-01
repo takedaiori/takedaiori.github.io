@@ -1,4 +1,5 @@
 'use strict'
+const { compareLocks } = require('./dependency-lock-diff.cjs')
 function riskyChanges(changes) {
   return changes.filter(change => change.change_type === 'added').flatMap(change =>
     (change.vulnerabilities || []).filter(issue => ['high', 'critical'].includes(issue.severity))
@@ -13,11 +14,54 @@ module.exports = async ({ github, context, core }) => {
     await core.summary.addHeading('Dependency review').addRaw('No dependency manifest or lockfile changes.').write()
     return
   }
-  // API failures fail the check; an unavailable graph is not a clean scan.
-  const { data } = await github.request('GET /repos/{owner}/{repo}/dependency-graph/compare/{basehead}', {
-    ...context.repo, basehead: `${pr.base.sha}...${pr.head.sha}`
-  })
-  if (!Array.isArray(data) || !data.length) throw Error('Dependency diff is not ready or empty; retry after the graph is updated, or review the manifest-only change explicitly.')
+  const content = async (ref, path) => {
+    const { data } = await github.rest.repos.getContent({ ...context.repo, ref, path })
+    if (data.encoding !== 'base64') throw Error('Cannot read complete dependency metadata')
+    return Buffer.from(data.content, 'base64').toString('utf8')
+  }
+  const [baseManifest, headManifest, baseLock, headLock] = await Promise.all([
+    content(pr.base.sha, 'package.json'), content(pr.head.sha, 'package.json'),
+    content(pr.base.sha, 'yarn.lock'), content(pr.head.sha, 'yarn.lock')
+  ])
+  const comparison = compareLocks(JSON.parse(baseManifest), JSON.parse(headManifest), baseLock, headLock)
+  if (comparison.removalOnly) {
+    await core.summary.addHeading('Dependency review').addRaw(`Verified removal-only dependency change: retained lock entries unchanged; ${comparison.removedEntries} entries removed. No new package version introduced.`).write()
+    return
+  }
+  let data
+  try {
+    const response = await github.request('GET /repos/{owner}/{repo}/dependency-graph/compare/{basehead}', {
+      ...context.repo, basehead: `${pr.base.sha}...${pr.head.sha}`
+    })
+    data = response.data
+    if (!Array.isArray(data) || !data.length) throw Error('Dependency diff is not ready')
+  } catch (error) {
+    core.warning(`GitHub dependency graph unavailable (${error.status || 'not ready'}); checking added locked npm versions with OSV.`)
+    if (comparison.unverifiedAdded.length) throw Error('Non-registry dependencies require manual source review.')
+    if (!comparison.added.length) throw Error('Lock sources or metadata changed without a new version; manual review required.')
+    let pending = comparison.added.map(item => ({ package: { name: item.name, ecosystem: 'npm' }, version: item.version }))
+    let findings = 0, rounds = 0
+    while (pending.length) {
+      if (++rounds > 20) throw Error('OSV pagination did not complete')
+      const queries = pending.splice(0, 50)
+      const response = await fetch('https://api.osv.dev/v1/querybatch', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ queries }), signal: AbortSignal.timeout(30000)
+      })
+      if (!response.ok) throw Error(`OSV query failed: ${response.status}`)
+      const result = await response.json()
+      if (!Array.isArray(result.results) || result.results.length !== queries.length) throw Error('Incomplete OSV response')
+      result.results.forEach((item, index) => {
+        if (item.vulns?.length) {
+          findings += item.vulns.length
+          core.error(`${queries[index].package.name}@${queries[index].version}: ${item.vulns.map(issue => issue.id).join(', ')}`)
+        } else if (item.next_page_token) pending.push({ ...queries[index], page_token: item.next_page_token })
+      })
+    }
+    await core.summary.addHeading('Dependency review: OSV fallback').addRaw(`${comparison.added.length} added locked npm versions checked; ${findings} advisory findings. Fallback conservatively blocks any known advisory; it does not silently ignore missing severity data.`).write()
+    if (findings) core.setFailed('Added dependency advisories found by OSV fallback.')
+    return
+  }
   const risky = riskyChanges(data)
   await core.summary.addHeading('Dependency review').addRaw(`${data.length} dependency changes; ${risky.length} added high/critical vulnerability findings.`).write()
   for (const issue of risky) core.error(`${issue.name}@${issue.version}: ${issue.severity} ${issue.advisory}`)

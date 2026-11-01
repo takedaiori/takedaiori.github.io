@@ -26,7 +26,7 @@ Insignificantia 的正文和目录保持原样。全站导航索引仅在启用�
 
 ## 依赖与审查归属
 
-Dependency review 工作流使用只读权限查询 GitHub 依赖图差异。新增 high/critical 已知漏洞阻止该检查成功；删除旧漏洞不阻止，moderate/low 仍需 Dependabot 持续跟踪。无依赖文件变化时明确跳过；API 不可用或依赖差异未就绪时不伪报通过，可稍后重跑。该检查不检测尚未公开的漏洞或所有恶意包。
+Dependency review 工作流使用只读权限查询 GitHub 依赖图差异。新增 high/critical 已知漏洞阻止该检查成功；删除旧漏洞不阻止，moderate/low 仍需 Dependabot 持续跟踪。无依赖文件变化时明确跳过；严格核实为只删除依赖且保留锁条目未变时，可证明没有引入新版本。其他更新在 GitHub API 不可用时查询新增锁定 npm 版本的 OSV 记录；备用检查保守阻止任何已知漏洞，查询失败或非标准下载源不伪报通过。该检查不检测尚未公开的漏洞或所有恶意包。
 
 现有自动依赖合并门禁增加 Dependency vulnerability review 要求；完整导出也增加产物扫描。白名单及原有自动合并/发布范围不扩大。
 
