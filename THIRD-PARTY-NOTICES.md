@@ -6,7 +6,7 @@
 
 | 项目 / 已核对版本 | 仓库范围或证据 | 许可 | 随站发布的原文 | 上游或发布包依据 |
 |---|---|---|---|---|
-| Font Awesome Free，CSS 标头 6.4.2 / 6.3.0 | public/vendor/fontawesome/css/all.min.css；public/css/all.min.css；相应 public/vendor/fontawesome/webfonts/ 与 public/webfonts/ 字体 | CSS 等代码 MIT；字体 OFL-1.1；上游 SVG/JS 图标形态 CC-BY-4.0（不表示本站所有 SVG 都来自该项目） | [Font Awesome Free 原文](./public/licenses/fontawesome-free-6.3.0-6.4.2.md) | [6.4.2](https://github.com/FortAwesome/Font-Awesome/blob/6.4.2/LICENSE.txt) / [6.3.0](https://github.com/FortAwesome/Font-Awesome/blob/6.3.0/LICENSE.txt)，两版原文一致 |
+| Font Awesome Free，CSS 标头 6.4.2（6.3.0 旧副本已移除） | public/vendor/fontawesome/css/all.min.css；public/vendor/fontawesome/webfonts/ 字体（历史版本许可记录仍保留） | CSS 等代码 MIT；字体 OFL-1.1；上游 SVG/JS 图标形态 CC-BY-4.0（不表示本站所有 SVG 都来自该项目） | [Font Awesome Free 原文](./public/licenses/fontawesome-free-6.3.0-6.4.2.md) | [6.4.2](https://github.com/FortAwesome/Font-Awesome/blob/6.4.2/LICENSE.txt) / [6.3.0](https://github.com/FortAwesome/Font-Awesome/blob/6.3.0/LICENSE.txt)，两版原文一致 |
 | React 18.3.1 | yarn.lock；核对 npm 18.3.1 发布包 package/LICENSE | MIT | [原文](./public/licenses/react-18.3.1-MIT.md) | [官方仓库](https://github.com/facebook/react) / [发布包](https://registry.npmjs.org/react/-/react-18.3.1.tgz) |
 | Next.js 15.5.28 | yarn.lock；上游 v15.5.28 license.md | MIT | [原文](./public/licenses/next-15.5.28-MIT.md) | [版本原文](https://github.com/vercel/next.js/blob/v15.5.28/license.md) |
 | Tabler Icons 3.49.0 | @tabler/icons-react 的锁定版本；上游 v3.49.0 LICENSE | MIT | [原文](./public/licenses/tabler-icons-3.49.0-MIT.md) | [版本原文](https://github.com/tabler/tabler-icons/blob/v3.49.0/LICENSE) |
