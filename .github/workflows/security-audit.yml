@@ -5,7 +5,7 @@ on:
     - cron: '23 3 * * 1'
   pull_request:
     branches: [main]
-    paths: ['vendored-resources.json', 'components/Lenis.js', 'components/FullScreenButton.js', 'lib/plugins/wow.js', 'next.config.js', 'package.json', 'yarn.lock', 'scripts/maintenance/*audit*', 'scripts/maintenance/security-surface-check.cjs', 'public/**', 'components/External*', 'components/VConsole.js', 'pages/auth/**', 'pages/api/auth/**', 'lib/security/**', '.github/workflows/security-audit.yml']
+    paths: ['scripts/maintenance/*page*', '.github/workflows/install-page-media-pack.yml', 'vendored-resources.json', 'components/Lenis.js', 'components/FullScreenButton.js', 'lib/plugins/wow.js', 'next.config.js', 'package.json', 'yarn.lock', 'scripts/maintenance/*audit*', 'scripts/maintenance/security-surface-check.cjs', 'public/**', 'components/External*', 'components/VConsole.js', 'pages/auth/**', 'pages/api/auth/**', 'lib/security/**', '.github/workflows/security-audit.yml']
 permissions:
   contents: read
 jobs:
