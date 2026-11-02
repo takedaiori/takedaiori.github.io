@@ -34,7 +34,8 @@ jest.mock('@/lib/config', () => ({
 describe('metadata during dynamic theme loading', () => {
   it.each([
     ['/category/[category]', { category: '知行合一' }, '/category/知行合一'],
-    ['/tag/[tag]', { tag: '工具' }, '/tag/工具']
+    ['/tag/[tag]', { tag: '工具' }, '/tag/工具'],
+    ['/category/[category]/page/[page]', { category: '知行合一', page: 2 }, '/category/知行合一/page/2']
   ])('keeps canonical and Open Graph metadata for %s', (route, fields, path) => {
     useRouter.mockReturnValue({ route, pathname: route, asPath: path, query: fields })
     const { container } = render(<MyApp Component={() => null} pageProps={{
@@ -43,10 +44,10 @@ describe('metadata during dynamic theme loading', () => {
     }} />)
     expect(container.querySelector('[data-testid="theme-loading"]')).toBeInTheDocument()
     expect(container.querySelector('link[rel="canonical"]')).toHaveAttribute(
-      'href', `https://takedaiori.github.io${path}`
+      'href', new URL(path, 'https://takedaiori.github.io').href
     )
     expect(container.querySelector('meta[property="og:url"]')).toHaveAttribute(
-      'content', `https://takedaiori.github.io${path}`
+      'content', new URL(path, 'https://takedaiori.github.io').href
     )
   })
 })

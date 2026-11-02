@@ -36,7 +36,7 @@ vendored-resources.json 记录本地制品 SHA-256、版本识别依据，以及
 
 ## GitHub 当前能确认的保护
 
-2026-11-02 重新读取公开规则集：Protect production main 为 Active，目标默认分支，没有 bypass。已启用禁止删除、禁止强推、必须 PR、审批数 0，以及五项 GitHub Actions 必需检查：Lint & type-check、Unit tests、Lockfile consistency、Dependency vulnerability review、Analyze (javascript-typescript)。已要求分支在合并前保持最新。本轮新增 Security audit gate、Site validation gate 和 Analyze (python) 已能稳定产生状态，但仍需所有者把它们加入规则集，不能把工作流上线等同于后台规则自动更新。
+2026-11-02 重新读取公开规则集：Protect production main 为 Active，目标默认分支，没有 bypass。已启用禁止删除、禁止强推、必须 PR、审批数 0，以及五项 GitHub Actions 必需检查：Lint & type-check、Unit tests、Lockfile consistency、Dependency vulnerability review、Analyze (javascript-typescript)。已要求分支在合并前保持最新。本轮已实际读取确认所有者加入 Security audit gate、Site validation gate 和 Analyze (python)，合计八项；不是仅因工作流能产生状态就推断后台规则已更新。
 
 旧式分支保护管理接口仍返回 403；这表示当前连接缺少相应管理读取权限，不能据此断言旧规则不存在。新规则集已经可以公开确认上述门禁。
 
@@ -63,13 +63,13 @@ vendored-resources.json 记录本地制品 SHA-256、版本识别依据，以及
    - Analyze (javascript-typescript)
 5. 建议启用 Require branches to be up to date before merging。主分支前进后，旧 PR 需要 Update branch，再等待新检查。
 6. 可启用 Require conversation resolution before merging。
-7. 新一轮已经取消安全审计与站点验证的工作流级 paths 筛选，并提供稳定的 Security audit gate 与 Site validation gate。现在应在上述五项之外，额外加入这两项和 Analyze (python)，同样选择 GitHub Actions 来源。文档修改由汇总门禁明确允许跳过导出；需要导出时若失败、取消或被权限条件跳过，会阻止通过。不要用原始 Full site export & artifact scan 或通用 audit 任务替代汇总门禁。完整步骤与后台边界见 [安全审计清单](security-audit-completion.md)。
+7. 新一轮已经取消安全审计与站点验证的工作流级 paths 筛选，并提供稳定的 Security audit gate 与 Site validation gate。所有者已在上述五项之外加入这两项和 Analyze (python)，均为 GitHub Actions 来源；以下步骤作为复核清单。文档修改由汇总门禁明确允许跳过导出；需要导出时若失败、取消或被权限条件跳过，会阻止通过。不要用原始 Full site export & artifact scan 或通用 audit 任务替代汇总门禁。完整步骤与后台边界见 [安全审计清单](security-audit-completion.md)。
 8. 不启用生产环境的 Require deployments to succeed before merging：本项目先合并 main，再手动部署 Pages；直接要求生产部署先完成会形成顺序冲突。
 9. 保存。设置立即生效，不需要部署 Pages。
 
 再打开 Settings → Branches → Branch protection rules，检查有没有匹配 main 的旧规则。若有，查看 required status checks / pull request reviews；不要直接删除整条旧规则。若它要求一个他人审批，新规则集中的 0 审批不会取消旧要求，仍会被卡住。需要把两处要求核对一致。
 
-这套配置会强制基础与新增安全门禁和 PR 流程，不等于保证没有漏洞，也不等于每个改动都必须全站导出。新增三项只有保存到规则集后才成为 GitHub 必需检查。保存后可以再次读取公开规则集验证内容；旧式管理配置仍需由有权限的用户在后台核对。不需要提供管理员 Token、密码或私钥。
+这套配置会强制基础与新增安全门禁和 PR 流程，不等于保证没有漏洞，也不等于每个改动都必须全站导出。新增三项已保存到规则集并核验生效。保存后可以再次读取公开规则集验证内容；旧式管理配置仍需由有权限的用户在后台核对。不需要提供管理员 Token、密码或私钥。
 
 
 ## 上一轮保留资源验证

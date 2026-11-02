@@ -1,7 +1,7 @@
 import { siteConfig } from '@/lib/config'
 import { useGlobal } from '@/lib/global'
 import { getPwaConfig } from '@/lib/pwa'
-import { createSiteUrl, normalizeSiteUrl } from '@/lib/sitemap-utils'
+import { createCanonicalUrl, createSiteUrl, normalizeSiteUrl } from '@/lib/sitemap-utils'
 import { isHttpLink, loadExternalResource } from '@/lib/utils'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -20,6 +20,7 @@ const SEO = props => {
   )
   const SUB_PATH = siteConfig('SUB_PATH', '')
   let url = PATH?.length ? createSiteUrl(LINK, SUB_PATH) || LINK : LINK
+  const canonicalBase = url
   const router = useRouter()
   const meta = getSEOMeta(props, router, useGlobal()?.locale)
   const webFontUrl = siteConfig('FONT_URL')
@@ -62,6 +63,7 @@ const SEO = props => {
   if (meta) {
     url = createSiteUrl(url, meta.slug) || url
   }
+  url = createCanonicalUrl(canonicalBase, router?.asPath) || url
   const TITLE = siteConfig('TITLE')
   const title = meta?.title || TITLE
   const description = meta?.description || `${siteInfo?.description}`
