@@ -74,3 +74,8 @@ webpack-internal:/
 
 # Local Cloudflare Worker route configuration
 /cloudflare/notion-image-proxy/wrangler.toml
+
+# Local maintenance output must never enter a public commit.
+backup/
+__pycache__/
+*.py[cod]
