@@ -4,7 +4,7 @@ const path = require('node:path')
 const crypto = require('node:crypto')
 function verify(manifest, root = '.') {
   if (manifest.schema !== 1) throw Error('Unsupported vendor inventory')
-  for (const item of manifest.local) {
+  for (const item of [...manifest.local, ...(manifest.source || [])]) {
     const hash = crypto.createHash('sha256').update(fs.readFileSync(path.join(root, item.path))).digest('hex')
     if (hash !== item.sha256) throw Error(`Vendored resource changed without a fresh review: ${item.path}`)
   }
@@ -41,7 +41,7 @@ async function main() {
   if (process.argv.includes('--offline')) { console.log('Vendored integrity checks passed'); return }
   const findings = await advisories(manifest)
   fs.mkdirSync('.perf', { recursive: true })
-  fs.writeFileSync('.perf/vendored-resource-audit.json', JSON.stringify({ generatedAt: new Date().toISOString(), packages: manifest.local.length + manifest.remote.length, findings }, null, 2) + '\n')
+  fs.writeFileSync('.perf/vendored-resource-audit.json', JSON.stringify({ generatedAt: new Date().toISOString(), packages: manifest.local.length + manifest.remote.length, reviewedSourceFiles: (manifest.source || []).length, findings }, null, 2) + '\n')
   console.log(`Vendored resource audit: ${manifest.local.length + manifest.remote.length} package queries; ${findings.length} advisory findings`)
   if (findings.length) { console.error(JSON.stringify(findings)); process.exitCode = 1 }
 }

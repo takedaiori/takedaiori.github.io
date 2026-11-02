@@ -56,6 +56,8 @@ jobs:
         run: .tmp/audit-tools/actionlint -shellcheck=.tmp/audit-tools/shellcheck
       - name: Compile all tracked Python maintenance code
         run: python -m compileall -q scripts/maintenance pushUrl.py
+      - name: Test retained submission security without network or dependencies
+        run: python -m unittest discover -s scripts/maintenance -p test_push_url_security.py
       - name: Check shell maintenance syntax
         run: bash -n scripts/update.sh && .tmp/audit-tools/shellcheck scripts/update.sh
       - name: Scan complete reachable Git history without exposing matching values

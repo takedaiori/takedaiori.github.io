@@ -34,12 +34,12 @@ def push_to_bing(site, urls, api_key):
     }
 
     try:
-        response = requests.post(endpoint, json=payload, timeout=20)
+        response = requests.post(endpoint, json=payload, timeout=20, allow_redirects=False)
         result = response.json()
         if response.status_code == 200:
             print("成功推送到Bing.")
         elif "ErrorCode" in result:
-            print("推送到Bing出现错误，错误信息为：", result["Message"])
+            print("Bing rejected the submission; response details withheld.")
     except requests.RequestException:
         print("Push request failed; credentials and response details withheld.")
 
@@ -51,14 +51,14 @@ def push_to_baidu(site, urls, token):
     headers = {"Content-Type": "text/plain"}
 
     try:
-        response = requests.post(api_url, data=payload, headers=headers, timeout=20)
+        response = requests.post(api_url, data=payload, headers=headers, timeout=20, allow_redirects=False)
         result = response.json()
         if "success" in result and result["success"]:
             print("成功推送到百度.")
         elif "error" in result:
-            print("推送到百度出现错误，错误信息为：", result["message"])
+            print("Baidu rejected the submission; response details withheld.")
         else:
-            print("Unknown response from Baidu:", result)
+            print("Unexpected Baidu response; details withheld.")
     except requests.RequestException:
         print("Push request failed; credentials and response details withheld.")
 

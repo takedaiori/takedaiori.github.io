@@ -5,6 +5,7 @@ let cusdisIframe
 function createIframe(targetElement) {
   if (!cusdisIframe) {
     cusdisIframe = document.createElement('iframe')
+    cusdisIframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-popups')
     setupIframe(cusdisIframe, targetElement)
   }
   cusdisIframe.srcdoc = generateIframeContent(targetElement)
@@ -15,6 +16,7 @@ function createIframe(targetElement) {
 function setupIframe(iframe, targetElement) {
   const colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
   const messageHandler = event => {
+    if (event.source !== iframe.contentWindow) return
     try {
       const message = JSON.parse(event.data)
       if (message.from === 'cusdis') {
@@ -25,7 +27,7 @@ function setupIframe(iframe, targetElement) {
             }
             break
           case 'resize':
-            iframe.style.height = message.data + 'px'
+            if (typeof message.data === 'number' && Number.isFinite(message.data) && message.data >= 0 && message.data <= 20000) iframe.style.height = message.data + 'px'
             break
         }
       }
@@ -43,8 +45,15 @@ function setupIframe(iframe, targetElement) {
 }
 
 function generateIframeContent(element) {
-  const cusdisHost = element.dataset.host || 'https://cusdis.com'
-  const iframeSrc = element.dataset.iframe || `${cusdisHost}/js/iframe.umd.js`
+  const host = new URL(element.dataset.host || 'https://cusdis.com')
+  if (host.protocol !== 'https:' || host.username || host.password || host.search || host.hash) throw Error('Cusdis requires HTTPS')
+  const base = host.href.replace(/\/$/, '')
+  const script = new URL(element.dataset.iframe || `${base}/js/iframe.umd.js`, host.origin)
+  if (script.origin !== host.origin || script.username || script.password) throw Error('Cusdis script must use the configured HTTPS host')
+  const escapeAttribute = value => value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  const serialize = value => JSON.stringify(value)?.replace(/</g, '\\u003c') || 'null'
+  const cusdisHost = escapeAttribute(base)
+  const iframeSrc = escapeAttribute(script.href)
   return `<!DOCTYPE html>
 <html>
   <head>
@@ -52,8 +61,8 @@ function generateIframeContent(element) {
     <base target="_parent" />
     <link>
     <script>
-      window.CUSDIS_LOCALE = ${JSON.stringify(window.CUSDIS_LOCALE)}
-      window.__DATA__ = ${JSON.stringify(element.dataset)}
+      window.CUSDIS_LOCALE = ${serialize(window.CUSDIS_LOCALE)}
+      window.__DATA__ = ${serialize(element.dataset)}
     <\/script>
     <style>
       :root {
@@ -72,7 +81,7 @@ function generateIframeContent(element) {
 
 function setTheme(theme, data) {
   if (cusdisIframe) {
-    cusdisIframe.contentWindow.postMessage(JSON.stringify({ from: 'cusdis', event: theme, data: data }))
+    cusdisIframe.contentWindow.postMessage(JSON.stringify({ from: 'cusdis', event: theme, data: data }), '*')
   }
 }
 

@@ -10,8 +10,11 @@ test('a changed retained bundle cannot pass the recorded integrity review', () =
     fs.writeFileSync(path.join(root, 'sample.js'), 'reviewed')
     const manifest = { schema: 1, local: [{ path: 'sample.js', sha256: crypto.createHash('sha256').update('reviewed').digest('hex') }], remote: [] }
     verify(manifest, root)
+    const sourceOnly = { ...manifest, local: [], source: manifest.local }
+    verify(sourceOnly, root)
     fs.writeFileSync(path.join(root, 'sample.js'), 'modified')
     expect(() => verify(manifest, root)).toThrow('fresh review')
+    expect(() => verify(sourceOnly, root)).toThrow('fresh review')
   } finally { fs.rmSync(root, { recursive: true, force: true }) }
 })
 test('vendored advisories include pagination even when the same page already has a finding', async () => {

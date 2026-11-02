@@ -132,7 +132,7 @@
 
   // 处理接收消息
   function handdleMessage(event) {
-    if (!giscusIframe) {
+    if (!giscusIframe || event.source !== giscusIframe.contentWindow) {
       return
     }
     event.origin === baseUrl &&
