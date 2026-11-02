@@ -1,5 +1,6 @@
-import { isSafeScriptUrl } from '@/lib/security/resourcePolicy'
 'use client'
+
+import { isSafeScriptUrl } from '@/lib/security/resourcePolicy'
 
 import { isBrowser } from '@/lib/utils'
 
