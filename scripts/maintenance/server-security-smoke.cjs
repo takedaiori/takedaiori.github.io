@@ -40,6 +40,10 @@ async function main() {
       assert(body.includes("default-src 'none'"), route)
       report.push({ route, status: response.status, inert: true })
     }
+    const framed = await fetch(origin + '/api/user')
+    assert.equal(framed.headers.get('x-frame-options'), 'DENY')
+    assert(framed.headers.get('content-security-policy')?.includes("frame-ancestors 'none'"))
+    report.push({ route: '/api/user', frameHeaders: true })
     fs.mkdirSync('.perf', { recursive: true })
     fs.writeFileSync('.perf/server-security-smoke.json', JSON.stringify(report, null, 2) + '\n')
     console.log(`Server security smoke checks passed: ${report.length}`)

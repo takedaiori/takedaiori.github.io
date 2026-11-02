@@ -120,6 +120,16 @@ jobs:
           retention-days: 7
           if-no-files-found: warn
 
+      - name: Verify static-host frame protection and canonical URLs
+        run: node scripts/maintenance/frame-guard-smoke.cjs
+      - name: Save frame protection evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: frame-guard-smoke
+          path: .perf/frame-guard-smoke.json
+          if-no-files-found: warn
+          retention-days: 7
       - name: Save validation report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
