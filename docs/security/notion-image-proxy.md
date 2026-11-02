@@ -4,7 +4,25 @@
 
 如果当前仍使用此代理：在 Cloudflare Dashboard → Workers & Pages → 对应 Worker → Edit code，复制下面完整代码后先保存预览，检查首页和文章图片，再 Deploy。无法在此连接读取实际部署版本、域名绑定、WAF、预算或账户权限，因此这些项目仍待后台核验。不要发送 API Token。
 
-建议在 Worker Settings → Bindings 配置名为 IMAGE_RATE_LIMITER 的原生 Rate Limiting binding，并根据自己的图片访问量设置规则（例如先用每 IP 每 60 秒 120 次作为起点观察；这不是全站流量保证）。有绑定时超限返回 429、绑定故障返回 503。没有绑定不会假装存在分布式限流；还需在账户中核对请求量、费用告警和必要的 WAF 规则。
+限流绑定须通过 Wrangler 配置，不能按 Dashboard 中的普通绑定来配置或核验；Cloudflare 官方说明该绑定目前不会显示在面板中。需要 Wrangler 4.36.0 或更高版本。
+
+仅在你实际使用这个 Worker 时，在它现有的 wrangler.toml 中加入以下配置。1001 是示例：先确认账户内未被其他 Worker 使用，再选择独立的正整数命名空间，避免共享计数。代码文件名、Worker 名称和域名沿用你当前项目，不要直接用示例域名覆盖生产配置。
+
+```toml
+[[ratelimits]]
+name = "IMAGE_RATE_LIMITER"
+namespace_id = "1001"
+
+[ratelimits.simple]
+limit = 120
+period = 60
+```
+
+120 次/60 秒仅作为初始观察值，须按实际每页图片数和访问量调整。有绑定时超限返回 429、绑定故障返回 503。它是每个 Cloudflare 节点的近似限流，不是跨节点的严格全局额度或费用硬上限；没有绑定时不声称已限流。还需在账户中核对请求量、费用告警和 WAF。若确需严格全局限额，要另行设计并验证 Durable Objects 方案，本轮不创建新的计费服务。
+
+使用现有 Wrangler 登录状态，先执行 wrangler deploy --dry-run，核对输出中的 Worker 名称、路由和绑定，再执行 wrangler deploy。不要把 API Token 粘贴进配置或聊天。部署后通过 Workers Logs/Traces 观察 429 与 503；不能因 Dashboard 看不到该绑定就断言没有配置。
+
+官方依据：[Cloudflare Rate Limiting binding](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)。
 
 源码仅向固定 Notion 起始域请求，不转发 Cookie 或 Authorization；只允许图片响应，禁止缓存错误，限制 10 MiB 与 10 秒请求时间，为 SVG 和其他图片设置 sandbox CSP 和 nosniff；新缓存版本不会复用旧版本未校验的条目。保留图片内容、ETag、Last-Modified、GET/HEAD 和条件请求。拒绝宽度超过 4096 的变换请求。超大图片需要在源头优化，不能靠无限制代理放开。
 
