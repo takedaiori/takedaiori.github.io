@@ -1,3 +1,4 @@
+import { isSameOriginResource } from '@/lib/security/resourcePolicy'
 import { siteConfig } from '@/lib/config'
 import { convertInnerUrl } from '@/lib/db/notion/convertInnerUrl'
 import { isBrowser, loadExternalResource } from '@/lib/utils'
@@ -112,18 +113,12 @@ const ExternalPlugin = props => {
     NOTION_CONFIG
   )
   const TIANLI_KEY = siteConfig('TianliGPT_KEY', null, NOTION_CONFIG)
-  const GLOBAL_JS = siteConfig('GLOBAL_JS', '', NOTION_CONFIG)
   const CLARITY_ID = siteConfig('CLARITY_ID', null, NOTION_CONFIG)
   const IMG_SHADOW = siteConfig('IMG_SHADOW', null, NOTION_CONFIG)
   const ANIMATE_CSS_URL = siteConfig('ANIMATE_CSS_URL', null, NOTION_CONFIG)
   const MOUSE_FOLLOW = siteConfig('MOUSE_FOLLOW', null, NOTION_CONFIG)
   const CUSTOM_EXTERNAL_CSS = siteConfig(
     'CUSTOM_EXTERNAL_CSS',
-    null,
-    NOTION_CONFIG
-  )
-  const CUSTOM_EXTERNAL_JS = siteConfig(
-    'CUSTOM_EXTERNAL_JS',
     null,
     NOTION_CONFIG
   )
@@ -149,14 +144,8 @@ const ExternalPlugin = props => {
       : []
   }, [CUSTOM_EXTERNAL_CSS])
 
-  const externalJsList = useMemo(() => {
-    return Array.isArray(CUSTOM_EXTERNAL_JS)
-      ? CUSTOM_EXTERNAL_JS.filter(url => !!url)
-      : []
-  }, [CUSTOM_EXTERNAL_JS])
-
   useEffect(() => {
-    if (!isBrowser) {
+    if (!isBrowser || DISABLE_PLUGIN) {
       return
     }
 
@@ -183,12 +172,8 @@ const ExternalPlugin = props => {
           loadExternalResource(ANIMATE_CSS_URL, 'css')
         }
 
-        for (const url of externalJsList) {
-          loadExternalResource(url, 'js')
-        }
-
         for (const url of externalCssList) {
-          loadExternalResource(url, 'css')
+          if (isSameOriginResource(url)) loadExternalResource(url, 'css')
         }
       })
     )
@@ -196,10 +181,11 @@ const ExternalPlugin = props => {
     return () => {
       cancelTasks.forEach(cancel => cancel?.())
     }
-  }, [ANIMATE_CSS_URL, IMG_SHADOW, externalCssList, externalJsList])
+  }, [ANIMATE_CSS_URL, IMG_SHADOW, externalCssList, DISABLE_PLUGIN])
 
   const router = useRouter()
   useEffect(() => {
+    if (DISABLE_PLUGIN) return
     // 异步渲染谷歌广告
     if (ADSENSE_GOOGLE_ID) {
       setTimeout(() => {
@@ -217,6 +203,7 @@ const ExternalPlugin = props => {
     }, 500)
   }, [
     router,
+    DISABLE_PLUGIN,
     ADSENSE_GOOGLE_ID,
     INNER_PAGE_URL_PARENT_PATH,
     innerLinkPages,
@@ -224,20 +211,7 @@ const ExternalPlugin = props => {
   ])
 
   useEffect(() => {
-    if (!isBrowser || !GLOBAL_JS || GLOBAL_JS.trim() === '') {
-      return
-    }
-
-    try {
-      // eslint-disable-next-line no-eval
-      eval(GLOBAL_JS)
-    } catch (error) {
-      console.error('Failed to execute GLOBAL_JS:', error)
-    }
-  }, [GLOBAL_JS])
-
-  useEffect(() => {
-    if (!isBrowser) return
+    if (!isBrowser || DISABLE_PLUGIN) return
     if (window.requestIdleCallback) {
       const id = window.requestIdleCallback(() => setPluginsIdle(true), {
         timeout: 3000
@@ -246,7 +220,7 @@ const ExternalPlugin = props => {
     }
     const id = window.setTimeout(() => setPluginsIdle(true), 2000)
     return () => window.clearTimeout(id)
-  }, [])
+  }, [DISABLE_PLUGIN])
 
   if (DISABLE_PLUGIN) {
     return null
@@ -281,7 +255,6 @@ const ExternalPlugin = props => {
       {WEB_WHIZ_ENABLED && <WebWhiz />}
       {AD_WWADS_BLOCK_DETECT && <AdBlockDetect />}
       {TIANLI_KEY && <TianliGPT />}
-      <VConsole />
       {ENABLE_NPROGRSS && <LoadingProgress />}
       {pluginsIdle && <AosAnimation />}
       {ANALYTICS_51LA_ID && ANALYTICS_51LA_CK && <LA51 />}
@@ -559,7 +532,6 @@ const Busuanzi = dynamic(() => import('@/components/Busuanzi'), { ssr: false })
 const Messenger = dynamic(() => import('@/components/FacebookMessenger'), {
   ssr: false
 })
-const VConsole = dynamic(() => import('@/components/VConsole'), { ssr: false })
 const CustomContextMenu = dynamic(
   () => import('@/components/CustomContextMenu'),
   { ssr: false }

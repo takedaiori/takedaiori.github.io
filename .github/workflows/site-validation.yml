@@ -6,6 +6,12 @@ on:
       - 'package.json'
       - 'yarn.lock'
       - 'public/**'
+      - 'components/**'
+      - 'lib/security/**'
+      - 'pages/api/**'
+      - 'netlify.toml'
+      - 'next.config.js'
+      - 'pages/auth/**'
       - 'pruning-plan.json'
       - 'scripts/maintenance/pruning-browser-smoke.cjs'
       - 'lib/db/**'
@@ -102,3 +108,20 @@ jobs:
           path: .perf/site-audit-report.json
           retention-days: 7
           if-no-files-found: error
+
+      - name: Build and scan server deployment without publishing
+        run: |
+          node scripts/maintenance/verify-server-env.cjs
+          yarn build
+          node scripts/maintenance/audit-server-output.cjs
+          node scripts/maintenance/server-security-smoke.cjs
+      - name: Save server validation evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: server-output-audit
+          path: |
+            .perf/server-output-audit.json
+            .perf/server-security-smoke.json
+          retention-days: 7
+          if-no-files-found: warn

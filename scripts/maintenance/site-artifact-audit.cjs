@@ -2,11 +2,12 @@
 const fs = require('node:fs')
 const path = require('node:path')
 const crypto = require('node:crypto')
-const textTypes = new Set(['.html', '.js', '.json', '.css', '.xml', '.txt', '.map', '.svg'])
+const textTypes = new Set(['.html', '.htm', '.js', '.json', '.css', '.xml', '.txt', '.map', '.svg'])
 const patterns = [
   ['private-key', /-----BEGIN (?:RSA |EC |OPENSSH |ENCRYPTED )?PRIVATE KEY-----[\r\n]+[A-Za-z0-9+/=\r\n]{64,}/],
   ['github-token', /(?:gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{60,})/],
-  ['openai-project-key', /sk-proj-[A-Za-z0-9_-]{40,}/]
+  ['openai-project-key', /sk-proj-[A-Za-z0-9_-]{40,}/],
+  ['supabase-secret-key', /sb_secret_[A-Za-z0-9_-]{24,}/]
 ]
 const bucket = file => file.startsWith('_next/static/') ? 'js-css-fonts' : file.startsWith('_next/data/') ? 'page-json' : file.endsWith('.html') ? 'html' : 'assets'
 function audit(root, baseline, secrets = []) {
@@ -28,14 +29,20 @@ function audit(root, baseline, secrets = []) {
       files[rel] = bytes
       const group = bucket(rawRel)
       groups[group] = (groups[group] || 0) + bytes
-      if (!textTypes.has(path.extname(rawRel))) continue
+      if (!textTypes.has(path.extname(rawRel).toLowerCase())) continue
       const text = fs.readFileSync(full, 'utf8')
       for (const [rule, pattern] of patterns) if (pattern.test(rule === 'private-key' ? text.replace(/\\r\\n|\\n|\\r/g, '\n') : text)) findings.push({ file: rel, rule })
       if (secrets.some(secret => secret.length >= 20 && text.includes(secret))) findings.push({ file: rel, rule: 'configured-secret' })
-      if (rawRel.endsWith('.html')) {
-        for (const match of text.matchAll(/<script\b[^>]*\bsrc\s*=\s*["'](https?:\/\/[^"']+)["']/gi)) {
-          try { scriptHosts.add(safeIdentifier(new URL(match[1]).hostname)) } catch {}
+      if (/\.html?$/i.test(rawRel)) {
+        for (const match of text.matchAll(/<script\b[^>]*\bsrc\s*=\s*["']((?:https?:)?\/\/[^"']+)["']/gi)) {
+          try { scriptHosts.add(safeIdentifier(new URL(match[1], 'https://audit.invalid').hostname)) } catch {}
+          const scriptUrl = new URL(match[1], 'https://audit.invalid')
+          const packageCdn = ['cdn.jsdelivr.net', 'unpkg.com'].includes(scriptUrl.hostname)
+          const pinnedPackage = /^\/(?:npm\/)?(?:@[^/]+\/)?[^/@]+@\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?\//i.test(scriptUrl.pathname)
+          const mutableCdn = packageCdn && !pinnedPackage
+          if (mutableCdn) findings.push({ file: rel, rule: 'unpinned-cdn-script' })
         }
+        if (/<(?:script|iframe)\b[^>]*\bsrc\s*=\s*["']\s*(?:javascript|data):/i.test(text)) findings.push({ file: rel, rule: 'executable-resource-url' })
       }
     }
   }

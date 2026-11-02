@@ -6,6 +6,10 @@ import subscribeToMailchimpApi from '@/lib/plugins/mailchimp'
  * @param {*} res
  */
 export default async function handler(req, res) {
+  if (process.env.SERVER_SUBSCRIPTIONS_ENABLED !== 'true') {
+    return res.status(503).json({ error: 'This public write integration requires a server security review before enabling' })
+  }
+
   if (req.method === 'POST') {
     const { email, firstName, lastName } = req.body
     try {
