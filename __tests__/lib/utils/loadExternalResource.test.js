@@ -7,6 +7,21 @@ describe('loadExternalResource', () => {
       .forEach(tag => tag.remove())
   })
 
+  it('applies SRI and rejects an existing unprotected script', async () => {
+    const url = 'https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js'
+    const integrity = 'sha384-test-fixture'
+    const pending = loadExternalResource(url, 'js', { integrity })
+    const script = document.head.querySelector(`script[src='${url}']`)
+    script.dataset.testResource = 'true'
+    expect(script.getAttribute('integrity')).toBe(integrity)
+    expect(script.crossOrigin).toBe('anonymous')
+    script.dispatchEvent(new Event('load'))
+    await expect(pending).resolves.toBe(url)
+    await expect(loadExternalResource(url, 'js', { integrity })).resolves.toBe(url)
+    script.removeAttribute('integrity')
+    await expect(loadExternalResource(url, 'js', { integrity })).rejects.toThrow('integrity')
+  })
+
   it('waits for an existing script to finish loading', async () => {
     const url = '/js/typed.min.js'
     const first = loadExternalResource(url, 'js')
