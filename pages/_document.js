@@ -1,5 +1,6 @@
 // eslint-disable-next-line @next/next/no-document-import-in-page
 import BLOG from '@/blog.config'
+import { frameGuardStyle, frameGuardScript, frameGuardNoScriptStyle, frameGuardMessage } from '@/lib/security/frameGuard.cjs'
 import { imageRevealBootstrap, imageRevealStyle } from '@/lib/utils/imageRevealBootstrap'
 import Document, { Head, Html, Main, NextScript } from 'next/document'
 
@@ -51,6 +52,9 @@ class MyDocument extends Document {
     return (
       <Html lang={BLOG.LANG}>
         <Head>
+          <style id='ins-frame-guard' dangerouslySetInnerHTML={{ __html: frameGuardStyle }} />
+          <script id='ins-frame-guard-script' dangerouslySetInnerHTML={{ __html: frameGuardScript }} />
+          <noscript><style dangerouslySetInnerHTML={{ __html: frameGuardNoScriptStyle }} /></noscript>
           <style dangerouslySetInnerHTML={{ __html: guideTransitionStyle }} />
           <script dangerouslySetInnerHTML={{ __html: guideTransitionBootstrap }} />
           <style dangerouslySetInnerHTML={{ __html: imageRevealStyle }} />
@@ -117,6 +121,7 @@ class MyDocument extends Document {
         </Head>
 
         <body>
+          <noscript id='ins-frame-noscript'>{frameGuardMessage}</noscript>
           <Main />
           <NextScript />
           <script

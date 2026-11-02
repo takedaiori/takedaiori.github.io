@@ -338,7 +338,9 @@ const nextConfig = {
         {
           source: '/:path*{/}?',
           headers: [
-            // 为了博客兼容性，不做过多安全限制
+            // Reject framing of this site; outgoing video/music embeds are unaffected.
+            { key: 'Content-Security-Policy', value: "frame-ancestors 'none'" },
+            { key: 'X-Frame-Options', value: 'DENY' },
             { key: 'Access-Control-Allow-Credentials', value: 'true' },
             { key: 'Access-Control-Allow-Origin', value: '*' },
             {

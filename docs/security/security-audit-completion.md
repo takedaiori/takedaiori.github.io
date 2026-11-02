@@ -16,19 +16,19 @@
 
 站点构建密钥只交给同仓库维护者分支，以及仅改变既有依赖版本/锁文件、其他 manifest 字段保持不变的同仓库 Dependabot PR；fork 和其他作者不获得凭据。Dependabot 自动维护仍受原来两项开发依赖补丁白名单限制，并在准备及最终合并前检查新增门禁和 Python CodeQL。保留现有完整导出，不扩大自动合并范围。
 
-**需要仓库所有者一次性设置：** 等本 PR 通过后，Settings → Rules → Rulesets → Protect production main → Require status checks，在已有五项之外添加 GitHub Actions 来源的：
+**已由所有者完成并只读核验：** Protect production main 的 Require status checks 已包含原有五项及以下三项，合计八项，来源均为 GitHub Actions：
 
 - Security audit gate
 - Site validation gate
 - Analyze (python)
 
-保持 PR、审批数 0、分支最新、禁止删除和强推、无旁路。当前连接不具备 administration 权限，不能替代这一步。上线代码不自动把一个检查变成 GitHub 必需项。
+已同时确认 PR、审批数 0、分支最新、禁止删除和强推、无旁路。规则立即生效，不依赖 Pages 部署；这一步由所有者在后台完成，工作流上线本身不会自动更新规则。当前连接仍不具备旧式保护接口的 administration 读取权限，旧式保护变更按本轮指示跳过。
 
 ## 外部服务：代码核对与后台证据分别记录
 
 | 对象 | 仓库代码可确认 | 仍需后台核验 |
 | --- | --- | --- |
-| GitHub | 新规则集的既有五项门禁；最小化 token、SHA 固定 Actions、无 fork 构建密钥；历史与产物扫描 | 旧式保护接口仍 403；额外三项必需检查、Secret scanning/Push protection、协作者、部署密钥、Webhook、App 安装、Actions/环境策略 |
+| GitHub | 新规则集八项必需门禁；最小化 token、SHA 固定 Actions、无 fork 构建密钥；历史与产物扫描 | 旧式保护接口仍 403，按所有者要求跳过变更；Secret scanning/Push protection、协作者、部署密钥、Webhook、App 安装、Actions/环境策略 |
 | Cloudflare | 公开 Analytics beacon 与账户 API Token 不同；图片代理源码可测试，固定 Notion 起始域且不转发用户凭据 | 实际运行版本、自定义域名、Rate Limiting binding、WAF、用量/费用告警、账户成员与 Token 作用域 |
 | Notion | 集成 token 与公开数据库 ID 分开；公共写入入口默认关闭，旧 OAuth 交换已停用 | 集成可访问页面、数据库授权范围、是否仍有旧 token、评论数据访问权限与日志 |
 | Supabase | 使用服务端 SUPABASE_SECRET_KEY/SERVICE_ROLE_KEY，无 NEXT_PUBLIC 服务密钥读取；客户端不持久化 session，调用方是服务端 API | RLS、Policies、anon/authenticated 表权限、服务密钥状态；源代码不能证明数据库已经配置 RLS |
@@ -70,4 +70,11 @@ where table_schema = 'public' and grantee in ('anon', 'authenticated');
 - 生产首页和一篇文章已作只读抽查，均返回 200；该文章图片仍来自 www.notion.so。不能据此认定其他域名或账户不存在，但不能因仓库有 Worker 源码就要求所有者新建 Cloudflare 服务。
 - Cloudflare 原生 Rate Limiting binding 目前不能在 Dashboard 直接查看，按 [正确的 Wrangler 配置步骤](notion-image-proxy.md) 核验；它按节点近似计数，不是全局严格预算上限。
 
-新增三个 GitHub 必需检查、旧式保护和实际使用的外部账户仍须所有者在后台核验。未使用的服务标记为未使用即可，不为审计创建账户、数据库或计费资源；这部分没有在无权限时假装完成。裁剪继续暂停。
+新增三个 GitHub 必需检查已确认加入；旧式保护的变更按所有者要求跳过，其他实际使用的外部账户仍未完成后台核验。未使用的服务标记为未使用即可，不为审计创建账户、数据库或计费资源；这部分没有在无权限时假装完成。裁剪继续暂停。
+
+
+## 本轮边界与下一阶段
+
+不访问旧式保护或外部账户的浏览器后台，不删除任何保护。源码扫描/构建已完成的结果与账户后台未核验状态分开记录。当前 Pages 未启用 Clerk/Supabase/Algolia/Redis，不据此断言账户中没有其他项目。
+
+本轮防嵌入与 canonical 实现及限制见 [专项说明](framing-and-canonical.md)；后续裁剪的文件、用途、确认条件及保留清单见 [裁剪候选](../maintenance/pruning-candidates.md)。目前仅列候选，没有执行裁剪。手动部署 Pages 才会更新主站 HTML；没有因为后台未核验而假装已完成全部账户审计。
