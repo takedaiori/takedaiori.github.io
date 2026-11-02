@@ -1,0 +1,8 @@
+title = "Insignificantia secret scanning"
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Reviewed public Cloudflare Web Analytics beacon identifier; not an account credential"
+regexTarget = "secret"
+regexes = ['^31806fbfd265499597af7db43f70f3e0$']

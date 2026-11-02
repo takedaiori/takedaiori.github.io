@@ -17,7 +17,7 @@ module.exports = async ({ github, context, core }) => {
   // Only accept successful checks produced by GitHub Actions on this exact head.
   const runs = await github.paginate(github.rest.checks.listForRef, { ...repo, ref: pr.head.sha, per_page: 100 })
   if (runs.some(c => c.name === 'Dependency static export' && c.app?.slug === 'github-actions' && c.conclusion === 'success')) return
-  const required = ['Dependency vulnerability review', 'Lint & type-check', 'Unit tests', 'Lockfile consistency', 'Analyze (javascript-typescript)']
+  const required = ['Dependency vulnerability review', 'Lint & type-check', 'Unit tests', 'Lockfile consistency', 'Analyze (javascript-typescript)', 'Analyze (python)', 'Security audit gate', 'Site validation gate']
   for (const name of required) {
     const check = runs.filter(c => c.name === name && c.app?.slug === 'github-actions').sort((a,b) => b.id-a.id)[0]
     if (check?.conclusion !== 'success') { core.notice(`Waiting for ${name}`); return }

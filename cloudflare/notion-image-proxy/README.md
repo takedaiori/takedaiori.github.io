@@ -36,7 +36,6 @@ Expected headers after repeat requests:
 ```text
 X-Notion-Image-Proxy: 1
 X-Notion-Image-Proxy-Cache: HIT
-CF-Cache-Status: HIT
 Cache-Control: public, max-age=31536000, s-maxage=31536000, immutable
 ETag: W/"..."
 ```
@@ -55,5 +54,9 @@ The expected status is `304 Not Modified` with no image body.
 node --test worker.test.mjs
 ```
 
-The test also checks that the copy-paste code in the VitePress tutorial stays
-identical to `worker.mjs`.
+The test also checks that the reviewed copy-paste code in
+`docs/security/notion-image-proxy.md` stays identical to `worker.mjs`.
+
+Security limits and manual Cloudflare deployment instructions: see that guide.
+The optional `IMAGE_RATE_LIMITER` binding is required for per-IP rate limiting;
+repository tests do not prove that the binding or account-level controls exist.

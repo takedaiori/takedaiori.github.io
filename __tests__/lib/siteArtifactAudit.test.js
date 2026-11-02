@@ -69,3 +69,17 @@ test('blocks mutable CDN scripts and executable iframe URLs, preserving pinned C
   put('legacy.htm', '<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.js"></script>')
   expect(audit(root, null).findings).toEqual([])
 })
+
+test('blocks privileged provider credentials while preserving public anon JWTs', () => {
+  const encode = data => Buffer.from(JSON.stringify(data)).toString('base64url')
+  const jwt = role => `${encode({ alg: 'HS256', typ: 'JWT' })}.${encode({ role, iss: 'synthetic-fixture' })}.${'z'.repeat(32)}`
+  put('public.json', JSON.stringify({ jwt: jwt('anon') }))
+  expect(audit(root, null).findings).toEqual([])
+  put('private.json', JSON.stringify({ jwt: jwt('service_role') }))
+  put('clerk.js', 'sk_' + 'live_' + 'x'.repeat(30))
+  put('notion.js', 'ntn_' + 'x'.repeat(40))
+  put('redis.js', 'rediss://user:synthetic-password@cache.invalid')
+  const report = audit(root, null)
+  expect(report.findings.map(f => f.rule).sort()).toEqual(['clerk-secret-key', 'notion-secret-key', 'redis-credential-url', 'supabase-service-role-jwt'])
+  expect(JSON.stringify(report)).not.toContain(jwt('service_role'))
+})
