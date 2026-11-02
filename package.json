@@ -125,6 +125,7 @@
     "zod": "^4.6.7"
   },
   "resolutions": {
+    "sucrase/**/picomatch": "4.0.7",
     "axios": ">=0.21.1",
     "esbuild": "^0.25.0",
     "flatted": "^3.4.2",
