@@ -36,22 +36,17 @@ vendored-resources.json 记录本地制品 SHA-256、版本识别依据，以及
 
 ## GitHub 当前能确认的保护
 
-公开规则集 Protect production main 已启用，目标为默认分支。其规则只有 deletion 和 non_fast_forward，禁止删除与强推，没有旁路名单。它没有声明 pull_request 或 required_status_checks。
+2026-11-02 重新读取公开规则集：Protect production main 为 Active，目标默认分支，没有 bypass。已启用禁止删除、禁止强推、必须 PR、审批数 0，以及五项 GitHub Actions 必需检查：Lint & type-check、Unit tests、Lockfile consistency、Dependency vulnerability review、Analyze (javascript-typescript)。已要求分支在合并前保持最新。
 
-旧式分支保护 GET 返回 403 Resource not accessible by integration：这是当前 GitHub App 的管理读取权限不足，不是发现入侵，也不是证明旧保护不存在。规则集与旧式保护可以叠加，不能仅凭这个公开规则集断言所有保护都已缺失。
+旧式分支保护管理接口仍返回 403；这表示当前连接缺少相应管理读取权限，不能据此断言旧规则不存在。新规则集已经可以公开确认上述门禁。
 
-CI 会执行测试和检查；只有在 GitHub 中配置为必需条件时，红灯/未完成状态才会被强制用于阻止合并。此前本项目的合并由助手实际核对检查结果，并不代表 GitHub 已强制所有操作者这样做。
+普通 Notion 写作、手动 Pages 部署不向 main 提交源码，因此不会被“必须 PR”拦截。源码、依赖、媒体文件更新需通过 PR；检查失败或分支落后时会被拦住，这是预期保护。
 
-## 启用强制门禁前，先核对两个旧维护任务
+## 旧维护任务已经适配
 
-代码中还有两处直接写 main 的维护流程：
-
-- Originality proofs：更新原创证明清单后直接 git push。最近可见的几次定时运行均为 skipped；这不等于已读取当前仓库变量配置。
-- Install page media pack：安装图片包后直接 push 到 main。
-
-强制 PR 和必需检查会拦截这两种旧写入方式。普通 Notion 写作、手动 Pages 部署不会因此被改成必须 PR，因为它们不提交 main 源码。如果你依赖这两个维护功能，应先改造为受检查的 PR 流程，再开启下面的规则；本轮没有改造或关闭它们。不要通过给机器人增加 bypass 来掩盖冲突。改造时还须处理 GITHUB_TOKEN 创建 PR 通常不会触发普通 CI 的限制，不能只把 push 的分支名改掉。
-
-如果目前不用这两个可选维护任务，可以配置下面的日常保护；以后先适配再运行它们。
+- Originality proofs 自动项目彻底关闭：删除定时/手动工作流、自动清单写入模块、自动开关和构建时调用。以后即使残留同名环境变量也不会启用自动写回。文章已有的手工原创信息、内容哈希展示开关和版权声明不属于自动写回任务，保持原功能。
+- Install page media pack 保留，改为只读校验和单独写分支两个 job。不会直接 push main，不授予 bypass，也不会自动部署。详见 [图片包维护说明](page-media-maintenance.md)。
+- 需要 PR 时由维护者或现有助手连接创建，使普通 PR CI 运行；不依赖机器人自行创建 PR 或 dispatch 检查替代所需的 PR 检查，不要求新 PAT 或新增 App 权限。
 
 ## 个人博客建议配置
 
@@ -77,6 +72,6 @@ CI 会执行测试和检查；只有在 GitHub 中配置为必需条件时，红
 这套推荐会强制基础门禁和 PR 流程，不等于保证没有漏洞，也不等于每个改动都必须全站导出。保存后可以再次读取公开规则集验证内容；旧式管理配置仍需由有权限的用户在后台核对。不需要提供管理员 Token、密码或私钥。
 
 
-## 本轮验证
+## 上一轮保留资源验证
 
 本地 368 项测试、70 个测试套件通过；类型检查和 lint 无错误；四项保留制品查询无已知公告命中。实际全站导出、20 组桌面/手机对照、服务器构建与 HTTP 检查由本 PR 的 Actions 验证。页面没有新增任何动效或按钮。GitHub 管理设置只做解释与只读核对，没有替用户修改。
