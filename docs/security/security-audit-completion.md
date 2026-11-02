@@ -2,6 +2,10 @@
 
 审计基线：f41c30d；2026-11-02。本轮只做安全检查和必要加固，未裁剪业务路由、页面数据、依赖功能或保留动画；Netlify 账户审计继续停止。
 
+## 当前状态（2026-11-02 后台核验续审）
+
+当前已部署生产基线为 `0106c55`。可读取的复核结果、Notion 模板公开权限发现，以及逐条后台权限交接，统一以 [后台安全审计交接](account-audit-handoff.md) 为准。裁剪事项已关闭，Netlify 后台审计已取消，旧式分支保护改动继续跳过。下方保留前轮证据；其历史基线不代表最新状态。
+
 ## 已执行的检查
 
 - 非浅克隆的可达 Git 历史由固定版本 Gitleaks 扫描；初次两条命中均为同一个 Cloudflare Web Analytics 公开浏览器 beacon 标识。核对来源后只精确排除该标识，没有整文件、整条规则或整个目录豁免。复扫无凭据命中。不可达/已删除远程引用、已过期日志和外部账户不在该结论内。
@@ -58,7 +62,7 @@ where table_schema = 'public' and grantee in ('anon', 'authenticated');
 
 ## 通过范围
 
-本地与 PR 检查记录分别保留；沙盒 Worker 测试不等于已部署 Cloudflare。源码合并和 Pages 部署不会自动完成后台权限设置。未完成后台项前不能把整个账户安全审计标为完成；裁剪候选继续暂停。
+本地与 PR 检查记录分别保留；沙盒 Worker 测试不等于已部署 Cloudflare。源码合并和 Pages 部署不会自动完成后台权限设置。未完成后台项前不能把整个账户安全审计标为完成；裁剪事项已关闭。
 
 
 ## 本轮最终证据补充
@@ -66,15 +70,15 @@ where table_schema = 'public' and grantee in ('anon', 'authenticated');
 - 仓库所有者 takedaiori 的 admin 身份已由连接器确认；旧式保护管理接口仍 403。这两者不冲突：账户的仓库角色不等于 GitHub App 获得 administration 接口权限。
 - 最新生产构建/部署，以及本轮维护扫描与测试日志，已作只读凭据模式核对，未命中所检查的规则；不覆盖已过期日志或所有未知格式。
 - 源码 CodeQL 额外读取实际 SARIF：JavaScript/TypeScript 与 Python 结果均为 0。不是仅以分析动作成功推断没有告警；有结果、失败/缺失/损坏报告会阻断 Analyze 检查。
-- 最终更新的全锁扫描为 1,087 个版本、2 类中低危公告/3 个包公告命中；glob 公告已通过 Sucrase 兼容补丁消除，详见 [工具链修复](toolchain-remediation.md)。现有与新增共 371 项 Jest 测试、15 项 Python 归档测试与 6 项 Worker 测试通过。
+- 最终更新的全锁扫描为 1,091 个版本、2 类中低危公告/2 个包公告命中；glob 公告已通过 Sucrase 兼容补丁消除，详见 [工具链修复](toolchain-remediation.md)。现有与新增共 385 项 Jest 测试、15 项 Python 归档测试与 6 项 Worker 测试通过。
 - 生产首页和一篇文章已作只读抽查，均返回 200；该文章图片仍来自 www.notion.so。不能据此认定其他域名或账户不存在，但不能因仓库有 Worker 源码就要求所有者新建 Cloudflare 服务。
 - Cloudflare 原生 Rate Limiting binding 目前不能在 Dashboard 直接查看，按 [正确的 Wrangler 配置步骤](notion-image-proxy.md) 核验；它按节点近似计数，不是全局严格预算上限。
 
-新增三个 GitHub 必需检查已确认加入；旧式保护的变更按所有者要求跳过，其他实际使用的外部账户仍未完成后台核验。未使用的服务标记为未使用即可，不为审计创建账户、数据库或计费资源；这部分没有在无权限时假装完成。裁剪继续暂停。
+新增三个 GitHub 必需检查已确认加入；旧式保护的变更按所有者要求跳过，其他实际使用的外部账户仍未完成后台核验。未使用的服务标记为未使用即可，不为审计创建账户、数据库或计费资源；这部分没有在无权限时假装完成。裁剪事项已关闭。
 
 
 ## 本轮边界与下一阶段
 
 不访问旧式保护或外部账户的浏览器后台，不删除任何保护。源码扫描/构建已完成的结果与账户后台未核验状态分开记录。当前 Pages 未启用 Clerk/Supabase/Algolia/Redis，不据此断言账户中没有其他项目。
 
-本轮防嵌入与 canonical 实现及限制见 [专项说明](framing-and-canonical.md)；后续裁剪的文件、用途、确认条件及保留清单见 [裁剪候选](../maintenance/pruning-candidates.md)。目前仅列候选，没有执行裁剪。手动部署 Pages 才会更新主站 HTML；没有因为后台未核验而假装已完成全部账户审计。
+本轮防嵌入与 canonical 实现及限制见 [专项说明](framing-and-canonical.md)；已关闭裁剪事项的历史文件、用途及保留清单见 [裁剪候选](../maintenance/pruning-candidates.md)。该裁剪计划已关闭，不再作为后续待办。手动部署 Pages 才会更新主站 HTML；没有因为后台未核验而假装已完成全部账户审计。
