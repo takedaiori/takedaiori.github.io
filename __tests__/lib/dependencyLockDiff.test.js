@@ -41,7 +41,7 @@ test('removal-only proof does not need a dependency graph or OSV response', asyn
 })
 test('403 fallback queries exact added versions and blocks known advisories', async () => {
   const args = fixture()
-  global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ results: [{ vulns: [{ id: 'GHSA-test' }] }] }) })
+  global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ results: [{ vulns: [{ id: 'GHSA-aaaa-bbbb-cccc' }] }] }) })
   await review(args)
   const body = JSON.parse(global.fetch.mock.calls[0][1].body)
   expect(body.queries).toEqual([{ package: { name: 'one', ecosystem: 'npm' }, version: '1.1.0' }])
@@ -58,3 +58,13 @@ test('npm aliases are audited under the real package name, not the local alias',
   expect(result.added).toEqual([{ name: 'one', version: '1.0.0' }])
   expect(result.unverifiedAdded).toEqual([])
 })
+
+ test('fallback reports moderate findings while preserving the high/critical gate', async () => {
+  const args = fixture()
+  global.fetch = jest.fn(async url => ({ ok: true, json: async () => url.endsWith('querybatch')
+    ? { results: [{ vulns: [{ id: 'GHSA-aaaa-bbbb-cccc' }] }] }
+    : { database_specific: { severity: 'MODERATE' } } }))
+  await review(args)
+  expect(args.core.warning).toHaveBeenCalledWith(expect.stringContaining('MODERATE'))
+  expect(args.core.setFailed).not.toHaveBeenCalled()
+ })

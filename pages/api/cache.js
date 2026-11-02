@@ -11,7 +11,10 @@ export default function handler(req, res) {
   }
 
   const token = process.env.CACHE_REVALIDATION_TOKEN
-  if (token && req.headers.authorization !== `Bearer ${token}`) {
+  if (!token) {
+    return res.status(503).json({ status: 'error', message: 'Cache maintenance is disabled' })
+  }
+  if (req.headers.authorization !== `Bearer ${token}`) {
     return res.status(401).json({ status: 'error', message: 'Unauthorized' })
   }
 

@@ -8,6 +8,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
  * @returns
  */
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (!process.env.CLERK_SECRET_KEY || !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+    return res.status(503).json({ error: 'Authentication is not configured' })
+  }
   try {
     const { userId } = getAuth(req)
 

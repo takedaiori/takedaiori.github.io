@@ -51,15 +51,25 @@ module.exports = async ({ github, context, core }) => {
       if (!response.ok) throw Error(`OSV query failed: ${response.status}`)
       const result = await response.json()
       if (!Array.isArray(result.results) || result.results.length !== queries.length) throw Error('Incomplete OSV response')
-      result.results.forEach((item, index) => {
-        if (item.vulns?.length) {
-          findings += item.vulns.length
-          core.error(`${queries[index].package.name}@${queries[index].version}: ${item.vulns.map(issue => issue.id).join(', ')}`)
-        } else if (item.next_page_token) pending.push({ ...queries[index], page_token: item.next_page_token })
-      })
+      for (const [index, item] of result.results.entries()) {
+        for (const issue of item.vulns || []) {
+          if (!/^GHSA-[a-z0-9-]+$|^CVE-\d{4}-\d+$/.test(issue.id)) throw Error('Unexpected advisory identifier')
+          const detailResponse = await fetch('https://api.osv.dev/v1/vulns/' + issue.id, { signal: AbortSignal.timeout(30000) })
+          if (!detailResponse.ok) throw Error('OSV advisory details unavailable')
+          const detail = await detailResponse.json()
+          if (detail.withdrawn) continue
+          const severity = detail.database_specific?.severity || 'UNKNOWN'
+          const message = `${queries[index].package.name}@${queries[index].version}: ${severity} ${issue.id}`
+          if (['HIGH', 'CRITICAL', 'UNKNOWN'].includes(severity)) {
+            findings++
+            core.error(message)
+          } else core.warning(message)
+        }
+        if (item.next_page_token) pending.push({ ...queries[index], page_token: item.next_page_token })
+      }
     }
-    await core.summary.addHeading('Dependency review: OSV fallback').addRaw(`${comparison.added.length} added locked npm versions checked; ${findings} advisory findings. Fallback conservatively blocks any known advisory; it does not silently ignore missing severity data.`).write()
-    if (findings) core.setFailed('Added dependency advisories found by OSV fallback.')
+    await core.summary.addHeading('Dependency review: OSV fallback').addRaw(`${comparison.added.length} added locked npm versions checked; ${findings} advisory findings. Fallback blocks high/critical advisories and unknown severity; moderate/low findings remain visible.`).write()
+    if (findings) core.setFailed('Added high/critical or unclassified dependency advisories found by OSV fallback.')
     return
   }
   const risky = riskyChanges(data)

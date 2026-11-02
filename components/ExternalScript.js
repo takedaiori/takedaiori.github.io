@@ -1,3 +1,4 @@
+import { isSafeScriptUrl } from '@/lib/security/resourcePolicy'
 'use client'
 
 import { isBrowser } from '@/lib/utils'
@@ -13,7 +14,9 @@ const ExternalScript = props => {
     return null
   }
 
-  const element = document.querySelector(`script[src="${src}"]`)
+  if (!isSafeScriptUrl(src, window.location.origin)) return null
+
+  const element = Array.from(document.scripts).find(script => script.getAttribute('src') === src)
   if (element) {
     return null
   }

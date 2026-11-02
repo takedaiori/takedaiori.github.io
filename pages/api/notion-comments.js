@@ -97,6 +97,10 @@ const getParentLevel = async (notion, parentId, postId) => {
 }
 
 export default async function handler(req, res) {
+  if (process.env.SERVER_NOTION_COMMENTS_ENABLED !== 'true') {
+    return res.status(503).json({ error: 'This public write integration requires a server security review before enabling' })
+  }
+
   if (req.method === 'GET') {
     const postId = String(req.query.postId || '').trim()
     if (!postId) {

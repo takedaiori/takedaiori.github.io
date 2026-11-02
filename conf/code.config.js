@@ -4,9 +4,9 @@
 module.exports = {
   // START********代码相关********
   // PrismJs 代码相关
-  PRISM_JS_PATH: 'https://npm.elemecdn.com/prismjs@1.29.0/components/',
+  PRISM_JS_PATH: 'https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/',
   PRISM_JS_AUTO_LOADER:
-    'https://npm.elemecdn.com/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js',
+    'https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js',
 
   // 代码主题 @see https://github.com/PrismJS/prism-themes
   PRISM_THEME_PREFIX_PATH:

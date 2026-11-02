@@ -55,3 +55,17 @@ test('redacts credential-bearing filenames from both findings and size inventory
   expect(report.findings[0].rule).toBe('credential-in-path')
   expect(JSON.stringify(report)).not.toContain(secret)
 })
+
+test('scans htm credentials and protocol-relative external script hosts', () => {
+  put('legacy.htm', '<script src="//cdn.example/versioned.js"></script>' + 'ghp_' + 'a'.repeat(36))
+  const report = audit(root, null)
+  expect(report.findings).toContainEqual({ file: 'legacy.htm', rule: 'github-token' })
+  expect(report.scriptHosts).toContain('cdn.example')
+})
+
+test('blocks mutable CDN scripts and executable iframe URLs, preserving pinned CDN imports', () => {
+  put('legacy.htm', '<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script><iframe src="javascript:alert(1)"></iframe>')
+  expect(audit(root, null).findings.map(f => f.rule)).toEqual(['unpinned-cdn-script', 'executable-resource-url'])
+  put('legacy.htm', '<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.js"></script>')
+  expect(audit(root, null).findings).toEqual([])
+})

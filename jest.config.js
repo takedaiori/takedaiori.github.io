@@ -29,7 +29,10 @@ const customJestConfig = {
   },
   
   // Test environment
-  testEnvironment: 'jest-environment-jsdom',
+  testEnvironment: '<rootDir>/scripts/test/browser-environment.cjs',
+  // JSDOM runs in Node: Clerk's server crypto dependency must use its CJS
+  // Node export rather than an untransformed browser-only ESM module.
+  testEnvironmentOptions: { customExportConditions: ['node', 'node-addons'] },
   
   // Test file patterns
   testMatch: [
