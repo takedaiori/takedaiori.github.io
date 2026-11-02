@@ -10,6 +10,8 @@ on:
       - 'lib/security/**'
       - 'pages/api/**'
       - 'netlify.toml'
+      - 'next.config.js'
+      - 'pages/auth/**'
       - 'pruning-plan.json'
       - 'scripts/maintenance/pruning-browser-smoke.cjs'
       - 'lib/db/**'

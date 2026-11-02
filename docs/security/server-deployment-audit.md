@@ -8,6 +8,7 @@ Scope: takedaiori/takedaiori.github.io. GitHub Pages currently serves a static e
 - Remove hidden production debugger loading and Notion-controlled GLOBAL_JS/CUSTOM_EXTERNAL_JS execution. Custom CSS is same-origin only.
 - Shared script loaders require same-origin files, reviewed versioned CDN URLs, or the explicit Cloudflare beacon exception. Adding a self-hosted integration requires a source-reviewed policy change; a Notion setting cannot extend the executable allowlist. This does not provide SRI for every third-party script or govern every script inserted by a third-party library.
 - Move Prism's default CDN to pinned jsDelivr and the fireworks dependency to pinned cdnjs. Existing third-party integrations outside the allowlist intentionally fail closed until reviewed.
+- Clerk middleware uses the stable Next.js 15.5 Node.js runtime, avoiding the Edge-only navigation import incompatibility observed during production compilation. Netlify adapter/runtime behavior with real authentication settings still requires preview acceptance testing.
 - Cache maintenance fails closed without its server token. User identity returns a controlled unavailable response when Clerk is unconfigured. Public subscription and Notion-comment writes require explicit server opt-in flags (`SERVER_SUBSCRIPTIONS_ENABLED`, `SERVER_NOTION_COMMENTS_ENABLED`), defaulting to disabled until the acceptance checks below are complete.
 - Disable both legacy Notion OAuth exchanges. They lacked OAuth state validation and exposed tokens via logs, URLs or props. Re-enabling requires a new state/PKCE-appropriate flow, HttpOnly session handling and a server-side token store. Do not enable by merely adding credentials.
 - Netlify response headers restrict embedding, plugins, base URLs and selected browser permissions. These headers are not applied by GitHub Pages. This is not a complete script CSP.
@@ -78,7 +79,7 @@ Keep the current static Pages deployment while testing a separate Netlify previe
 
 这些是仍保留的已知问题，不应写成“全部漏洞已修复”。本项目对应入口是构建/测试配置，未发现接受博客访客输入的调用路径。全量扫描继续展示这些命中；任何高危、严重、未知评级或扫描服务故障都会失败。后续升级整组工具时继续消除，不通过屏蔽公告假装清零。
 
-已在本地验证：359 项测试通过，类型检查通过，lint 无错误，冻结锁文件离线安装通过。实际数据全站导出、浏览器回归、服务器构建及真实 HTTP 安全检查由本 PR 的 Actions 再验证；本地结果不替代真实部署验收。
+已在本地验证：359 项测试通过，类型检查通过，lint 无错误，冻结锁文件离线安装通过。本地服务器生产编译和 8 项真实 HTTP 安全检查也已通过。实际数据全站导出、浏览器回归、服务器构建及真实 HTTP 安全检查由本 PR 的 Actions 再验证；本地结果不替代真实部署验收。
 
 ### 如何完成需要后台权限的部分
 
