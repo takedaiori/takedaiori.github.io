@@ -8,7 +8,13 @@ function findings(report) {
     if (!run.tool?.driver?.name || (run.results !== undefined && !Array.isArray(run.results))) throw Error('Incomplete SARIF run')
     if ((run.invocations || []).some(invocation => invocation.executionSuccessful === false)) throw Error('CodeQL invocation failed')
     for (const result of run.results || []) {
-      if (!['pass', 'notApplicable'].includes(result.kind)) count++
+      if (!['pass', 'notApplicable'].includes(result.kind)) {
+        count++
+        // Rule IDs and repository paths are enough to locate a finding. Never log messages or source snippets.
+        const clean = value => String(value || 'unknown').replace(/[^A-Za-z0-9_./:@-]/g, '_').slice(0, 240)
+        const location = result.locations?.[0]?.physicalLocation
+        console.log(`CodeQL finding: ${clean(result.ruleId)} ${clean(location?.artifactLocation?.uri)}:${Number(location?.region?.startLine) || 0}`)
+      }
     }
   }
   return count

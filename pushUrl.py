@@ -1,12 +1,10 @@
 import random
 import re
-import ssl
 import time
 
 import requests
 import argparse
 
-ssl._create_default_https_context = ssl._create_unverified_context
 
 
 # 每日推送限额，可根据实际情况修改
@@ -16,7 +14,7 @@ QUOTA = 100
 def parse_sitemap(site):
     site = f'{site}/sitemap.xml'
     try:
-        result = requests.get(site)
+        result = requests.get(site, timeout=20)
         big = re.findall('<loc>(.*?)</loc>', result.content.decode('utf-8'), re.S)
         return list(big)
     except:
@@ -36,33 +34,33 @@ def push_to_bing(site, urls, api_key):
     }
 
     try:
-        response = requests.post(endpoint, json=payload)
+        response = requests.post(endpoint, json=payload, timeout=20, allow_redirects=False)
         result = response.json()
         if response.status_code == 200:
             print("成功推送到Bing.")
         elif "ErrorCode" in result:
-            print("推送到Bing出现错误，错误信息为：", result["Message"])
-    except Exception as e:
-        print("An error occurred:", e)
+            print("Bing rejected the submission; response details withheld.")
+    except requests.RequestException:
+        print("Push request failed; credentials and response details withheld.")
 
 
 def push_to_baidu(site, urls, token):
-    api_url = f"http://data.zz.baidu.com/urls?site={site}&token={token}"
+    api_url = f"https://data.zz.baidu.com/urls?site={site}&token={token}"
 
     payload = "\n".join(urls)
     headers = {"Content-Type": "text/plain"}
 
     try:
-        response = requests.post(api_url, data=payload, headers=headers)
+        response = requests.post(api_url, data=payload, headers=headers, timeout=20, allow_redirects=False)
         result = response.json()
         if "success" in result and result["success"]:
             print("成功推送到百度.")
         elif "error" in result:
-            print("推送到百度出现错误，错误信息为：", result["message"])
+            print("Baidu rejected the submission; response details withheld.")
         else:
-            print("Unknown response from Baidu:", result)
-    except Exception as e:
-        print("An error occurred:", e)
+            print("Unexpected Baidu response; details withheld.")
+    except requests.RequestException:
+        print("Push request failed; credentials and response details withheld.")
 
 
 if __name__ == '__main__':

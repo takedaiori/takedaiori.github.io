@@ -59,7 +59,8 @@
     "translate:all": "node scripts/translate/index.js --batch",
     "translate:check": "node scripts/translate/index.js --check-drift",
     "translate:backfill": "node scripts/translate/index.js --backfill",
-    "translate:diagnose": "node scripts/translate/index.js --diagnose"
+    "translate:diagnose": "node scripts/translate/index.js --diagnose",
+    "postinstall": "node scripts/maintenance/patch-deepmerge.cjs"
   },
   "dependencies": {
     "@clerk/localizations": "^3.37.10",
@@ -125,6 +126,7 @@
     "zod": "^4.6.7"
   },
   "resolutions": {
+    "**/@typescript-eslint/typescript-estree/minimatch": "11.0.4",
     "sucrase/**/picomatch": "4.0.7",
     "axios": ">=0.21.1",
     "esbuild": "^0.25.0",
@@ -145,11 +147,9 @@
     "postcss-selector-parser": "^6.1.5",
     "ip-address": "^10.7.4",
     "puppeteer-core": "^25.16.0",
-    "brace-expansion": "^2.1.7",
     "ws": "^8.22.0",
     "zod": "^4.6.7",
-    "basic-ftp": "^6.2.1",
-    "**/@typescript-eslint/typescript-estree/minimatch": "^9.0.9"
+    "basic-ftp": "^6.2.1"
   },
   "bugs": {
     "url": "https://github.com/notionnext-org/NotionNext/issues",

@@ -25,6 +25,22 @@
       "queryAllVersions": false,
       "sha256": "b84694a6f8baad3c95ea65364a3e7a3743c944ec4c1d2105fb9cce24af8094a5",
       "identification": "Banner identifies a local subset; reviewed CSS contains no import, resource URL, expression or behavior declarations."
+    },
+    {
+      "path": "public/js/aos.js",
+      "package": "aos",
+      "version": "unverified-local-build",
+      "queryAllVersions": true,
+      "sha256": "d26089b82d1d6e97a8e8617e871733153888456a9107a69e1eb1d7e7678f00cc",
+      "identification": "Local formatted AOS build without reliable version banner; query every AOS package version conservatively, rather than infer a version."
+    },
+    {
+      "path": "public/css/aos.css",
+      "package": "aos",
+      "version": "unverified-local-build",
+      "queryAllVersions": true,
+      "sha256": "fd596ddbed1ac2bd67380a6859f764ee73e222c0a4ac8e9a7171a356ed8bb22a",
+      "identification": "Local formatted AOS build without reliable version banner; query every AOS package version conservatively, rather than infer a version."
     }
   ],
   "remote": [
@@ -35,6 +51,93 @@
       "integrity": "sha384-V27yAyb3yYhZbiwaK9Sgxh9Cywkf/H2al4wcrcp/hKF9ZYT7d5saGJFoO/0v1Cgs",
       "loader": "lib/plugins/wow.js",
       "identification": "Reviewed CDN artifact; pinned by SHA-384. Not byte-identical to the npm wowjs build."
+    }
+  ],
+  "source": [
+    {
+      "path": "public/js/cusdis.es.js",
+      "sha256": "153c925b455e96829b1a54df2202c941be4652c40b1a7ff57190d48bc4056bfa",
+      "identification": "Repository-controlled source reviewed for the retained-resource security closure; no reliable matching npm runtime/version established. Integrity tracking is not a vulnerability-database scan."
+    },
+    {
+      "path": "public/js/giscus.js",
+      "sha256": "6daaba0af51699691e7f094c0851d738d07d07cf029315a820fab428e5d21085",
+      "identification": "Repository-controlled source reviewed for the retained-resource security closure; no reliable matching npm runtime/version established. Integrity tracking is not a vulnerability-database scan."
+    },
+    {
+      "path": "public/js/spoilerText.js",
+      "sha256": "f94d4482c13b24f39082c2837133e96b12295c2dfed2e617389a7e075629f552",
+      "identification": "Repository-controlled source reviewed for the retained-resource security closure; no reliable matching npm runtime/version established. Integrity tracking is not a vulnerability-database scan."
+    },
+    {
+      "path": "public/js/custom.js",
+      "sha256": "93a01416f53cb92453048b322cf91607f2dc589cb742f107c7b9c5b051d1c4e7",
+      "identification": "Repository-controlled source reviewed for the retained-resource security closure; no reliable matching npm runtime/version established. Integrity tracking is not a vulnerability-database scan."
+    },
+    {
+      "path": "public/js/fireworks.js",
+      "sha256": "f75e89d2f1e4a16ceca1c8db52fad1c522a7f90a461cafeb6e232df210023b7b",
+      "identification": "Repository-controlled source reviewed for the retained-resource security closure; no reliable matching npm runtime/version established. Integrity tracking is not a vulnerability-database scan."
+    },
+    {
+      "path": "public/js/sakura.js",
+      "sha256": "24df7821ec62a55688b493544eb597ecd221536d4994c113fd6105cfbd9a7173",
+      "identification": "Repository-controlled source reviewed for the retained-resource security closure; no reliable matching npm runtime/version established. Integrity tracking is not a vulnerability-database scan."
+    },
+    {
+      "path": "public/js/starrySky.js",
+      "sha256": "df57843b08fd68f71c72a95009537def234388b4ac418f3d3e8e7b207dab505b",
+      "identification": "Repository-controlled source reviewed for the retained-resource security closure; no reliable matching npm runtime/version established. Integrity tracking is not a vulnerability-database scan."
+    },
+    {
+      "path": "public/js/nest.js",
+      "sha256": "c0a457e2daa369a2dfed7a48adfa3d2c5b5a97bd0ac0c754239e86eab5c498b4",
+      "identification": "Repository-controlled source reviewed for the retained-resource security closure; no reliable matching npm runtime/version established. Integrity tracking is not a vulnerability-database scan."
+    },
+    {
+      "path": "public/js/flutteringRibbon.js",
+      "sha256": "0933f0fec7aa770d9a80f965873e37a0da5efce65bd43109d104e1ba7bdebd9d",
+      "identification": "Repository-controlled source reviewed for the retained-resource security closure; no reliable matching npm runtime/version established. Integrity tracking is not a vulnerability-database scan."
+    },
+    {
+      "path": "public/js/ribbon.js",
+      "sha256": "0a5cc8acb57efe1398ec18e296dd79f8b5284a6f2e8055cf3dbaaaf51a57555b",
+      "identification": "Repository-controlled source reviewed for the retained-resource security closure; no reliable matching npm runtime/version established. Integrity tracking is not a vulnerability-database scan."
+    },
+    {
+      "path": "public/js/mouse-follow.js",
+      "sha256": "23f45db21621f749a77210ba9e3a64fefb9fa18b8ff3c8cc41931df93ff0c229",
+      "identification": "Repository-controlled source reviewed for the retained-resource security closure; no reliable matching npm runtime/version established. Integrity tracking is not a vulnerability-database scan."
+    },
+    {
+      "path": "public/css/custom.css",
+      "sha256": "d1c99d56cff94e7c07bf1e0615a3fd0f8aec890ac32b91523fa26414f4e3abfc",
+      "identification": "Repository-controlled source reviewed for the retained-resource security closure; no reliable matching npm runtime/version established. Integrity tracking is not a vulnerability-database scan."
+    },
+    {
+      "path": "public/css/spoiler-text.css",
+      "sha256": "7972388b6b682e3bb3be5a3ead5d2ab145970e3766145cb6faed6e0ab7e1eaed",
+      "identification": "Repository-controlled source reviewed for the retained-resource security closure; no reliable matching npm runtime/version established. Integrity tracking is not a vulnerability-database scan."
+    },
+    {
+      "path": "public/css/prism-mac-style.css",
+      "sha256": "382d5d900e12389a2493decc04d6f97ac2ed2210377214d520f60870faa14294",
+      "identification": "Repository-controlled source reviewed for the retained-resource security closure; no reliable matching npm runtime/version established. Integrity tracking is not a vulnerability-database scan."
+    },
+    {
+      "path": "public/css/img-shadow.css",
+      "sha256": "f5f22d80dc3db9f8005d645aa619fd8ac551fbe5f2c918416bdef2f076e390f9",
+      "identification": "Repository-controlled source reviewed for the retained-resource security closure; no reliable matching npm runtime/version established. Integrity tracking is not a vulnerability-database scan."
+    },
+    {
+      "path": "public/sw.js",
+      "sha256": "db770dfd5a3fbab4c81002fbe2f534c8bc81ed3eb6a5f6b26b7332a6fab996e6",
+      "identification": "Repository-controlled source reviewed for the retained-resource security closure; no reliable matching npm runtime/version established. Integrity tracking is not a vulnerability-database scan."
+    },
+    {
+      "path": "public/manifest.json",
+      "sha256": "f1b825bfe2d6bbceb5a3ceae6450fd34b6a0215a847e667f874b05e6fcc3dd5e",
+      "identification": "Repository-controlled source reviewed for the retained-resource security closure; no reliable matching npm runtime/version established. Integrity tracking is not a vulnerability-database scan."
     }
   ]
 }
