@@ -67,7 +67,7 @@ test('keeps the VitePress copy-paste example in sync with worker.mjs', async () 
   )
   const tutorial = await readFile(
     new URL(
-      '../../docs/user-guide/deploy/notion-image-proxy.md',
+      '../../docs/security/notion-image-proxy.md',
       import.meta.url
     ),
     'utf8'
@@ -83,3 +83,56 @@ test('keeps the VitePress copy-paste example in sync with worker.mjs', async () 
 function normalize(value) {
   return value.replace(/\r\n/g, '\n').trim()
 }
+
+async function withProxy(upstream, action, env) {
+  const originalFetch = globalThis.fetch, originalCaches = globalThis.caches
+  let writes = 0, calls = 0
+  globalThis.fetch = async (_url, options) => {
+    calls++
+    assert.equal(options.headers.Authorization, undefined)
+    assert.equal(options.headers.Cookie, undefined)
+    return upstream()
+  }
+  globalThis.caches = { default: { match: async () => undefined, put: async () => { writes++ } } }
+  try { await action(() => worker.fetch(new Request('https://proxy.example/image/test', { headers: { Cookie: 'synthetic=1', Authorization: 'synthetic' } }), env), () => ({ writes, calls })) }
+  finally { globalThis.fetch = originalFetch; globalThis.caches = originalCaches }
+}
+
+test('rejects HTML and upstream errors without caching', async () => {
+  for (const response of [() => new Response('<script>bad</script>', { headers: { 'Content-Type': 'text/html' } }), () => new Response('error', { status: 500 })]) {
+    await withProxy(response, async (request, state) => {
+      const result = await request()
+      assert.ok([415, 502].includes(result.status))
+      assert.equal(result.headers.get('cache-control'), 'no-store')
+      assert.equal(state().writes, 0)
+    })
+  }
+})
+
+test('bounds both declared and streamed image size', async () => {
+  for (const response of [() => new Response('small', { headers: { 'Content-Type': 'image/png', 'Content-Length': '20000000' } }), () => new Response(new Uint8Array(10 * 1024 * 1024 + 1), { headers: { 'Content-Type': 'image/png' } })]) {
+    await withProxy(response, async (request, state) => {
+      assert.equal((await request()).status, 413)
+      assert.equal(state().writes, 0)
+    })
+  }
+})
+
+test('SVG is served with sandbox and nosniff; credentials are not forwarded', async () => {
+  await withProxy(() => new Response('<svg/>', { headers: { 'Content-Type': 'image/svg+xml', 'Set-Cookie': 'bad=1', 'Access-Control-Allow-Credentials': 'true' } }), async request => {
+    const result = await request()
+    assert.match(result.headers.get('content-security-policy'), /sandbox/)
+    assert.equal(result.headers.get('x-content-type-options'), 'nosniff')
+    assert.equal(result.headers.get('set-cookie'), null)
+    assert.equal(result.headers.get('access-control-allow-credentials'), null)
+  })
+})
+
+test('configured rate limit fails closed and avoids upstream calls', async () => {
+  for (const [binding, status] of [[{ limit: async () => ({ success: false }) }, 429], [{ limit: async () => { throw Error('offline') } }, 503]]) {
+    await withProxy(() => new Response('unused'), async (request, state) => {
+      assert.equal((await request()).status, status)
+      assert.equal(state().calls, 0)
+    }, { IMAGE_RATE_LIMITER: binding })
+  }
+})

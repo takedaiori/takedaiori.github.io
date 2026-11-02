@@ -1,12 +1,12 @@
 'use strict'
 const fs = require('node:fs')
 const path = require('node:path')
-const { audit } = require('./site-artifact-audit.cjs')
+const { audit, configuredSecrets } = require('./site-artifact-audit.cjs')
 function main() {
   if (!fs.existsSync('.next/BUILD_ID')) throw Error('A completed server build is required')
   const roots = ['public', '.next/static']
   if (fs.existsSync('.next/server/pages')) roots.push('.next/server/pages')
-  const reports = roots.map(root => ({ root, ...audit(path.resolve(root), null) }))
+  const reports = roots.map(root => ({ root, ...audit(path.resolve(root), null, configuredSecrets()) }))
   fs.mkdirSync('.perf', { recursive: true })
   fs.writeFileSync('.perf/server-output-audit.json', JSON.stringify(reports, null, 2) + '\n')
   let failed = false

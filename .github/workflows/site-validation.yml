@@ -2,27 +2,6 @@ name: Site export validation
 on:
   pull_request:
     branches: [main]
-    paths:
-      - 'package.json'
-      - 'yarn.lock'
-      - 'public/**'
-      - 'components/**'
-      - 'lib/security/**'
-      - 'pages/api/**'
-      - 'netlify.toml'
-      - 'next.config.js'
-      - 'pages/auth/**'
-      - 'pruning-plan.json'
-      - 'scripts/maintenance/pruning-browser-smoke.cjs'
-      - 'lib/db/**'
-      - 'lib/utils/articlePageData.js'
-      - 'lib/utils/post.js'
-      - 'conf/post.config.js'
-      - 'scripts/maintenance/*page*'
-      - '.github/workflows/install-page-media-pack.yml'
-      - 'scripts/maintenance/site-artifact-audit.cjs'
-      - '.github/workflows/deploy-pages.yml'
-      - '.github/workflows/site-validation.yml'
 permissions:
   contents: read
   actions: read
@@ -30,11 +9,47 @@ concurrency:
   group: site-validation-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 jobs:
+  scope:
+    name: Classify release validation scope
+    runs-on: ubuntu-latest
+    outputs:
+      required: ${{ steps.scope.outputs.required }}
+      dependency_only: ${{ steps.scope.outputs.dependency_only }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - id: scope
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: node scripts/maintenance/validation-scope.cjs
+  gate:
+    name: Site validation gate
+    needs: [scope, export]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require successful validation or an explicit documentation-only exemption
+        env:
+          SCOPE_RESULT: ${{ needs.scope.result }}
+          REQUIRED: ${{ needs.scope.outputs.required }}
+          EXPORT_RESULT: ${{ needs.export.result }}
+        run: |
+          test "$SCOPE_RESULT" = success
+          if [ "$REQUIRED" = false ]; then
+            test "$EXPORT_RESULT" = skipped
+          else
+            test "$REQUIRED" = true
+            test "$EXPORT_RESULT" = success
+          fi
   export:
     name: Full site export & artifact scan
-    # Only owner-authored branches in this repository may use the data-source
-    # credential. Forks and other authors never receive this build context.
-    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.user.login == github.repository_owner
+    # Owner branches or same-repo Dependabot version-only updates may build.
+    # Changes to scripts, dependency names or other files do not qualify as bot updates.
+    needs: scope
+    if: needs.scope.outputs.required == 'true' && github.event.pull_request.head.repo.full_name == github.repository && (github.event.pull_request.user.login == github.repository_owner || (github.event.pull_request.user.login == 'dependabot[bot]' && needs.scope.outputs.dependency_only == 'true'))
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:

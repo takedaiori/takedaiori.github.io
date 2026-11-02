@@ -119,6 +119,7 @@ jobs:
         run: |
           BRANCH="maintenance/page-media-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           [[ "$BRANCH" =~ ^maintenance/page-media-[0-9]+-[0-9]+$ ]]
+          # shellcheck disable=SC2016 # Expand the token only inside Git's credential helper.
           git -c credential.helper='!f() { echo username=x-access-token; echo "password=$GITHUB_TOKEN"; }; f' push origin "HEAD:refs/heads/$BRANCH"
           echo "### Create an image maintenance PR" >> "$GITHUB_STEP_SUMMARY"
           echo "Open https://github.com/${GITHUB_REPOSITORY}/compare/main...${BRANCH}?expand=1 or ask the assistant to create this PR. Wait for required checks, merge, then manually deploy Pages. This workflow neither merges nor deploys." >> "$GITHUB_STEP_SUMMARY"

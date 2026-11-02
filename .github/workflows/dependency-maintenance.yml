@@ -1,7 +1,7 @@
 name: Dependency maintenance
 on:
   workflow_run:
-    workflows: [CI, CodeQL, Dependency review]
+    workflows: [CI, CodeQL, Dependency review, Full security audit, Site export validation]
     types: [completed]
   workflow_dispatch:
     inputs:
@@ -105,6 +105,11 @@ jobs:
             const args = {...context.repo, pull_number: Number(process.env.PR_NUMBER)};
             const {data: pr} = await github.rest.pulls.get(args);
             if (pr.state !== 'open' || pr.user.login !== 'dependabot[bot]' || pr.head.sha !== process.env.EXPECTED_SHA) throw Error('PR changed; refusing merge');
+            const checks = await github.paginate(github.rest.checks.listForRef, {...context.repo, ref: process.env.EXPECTED_SHA, per_page: 100});
+            for (const name of ['Lint & type-check', 'Unit tests', 'Lockfile consistency', 'Dependency vulnerability review', 'Analyze (javascript-typescript)', 'Analyze (python)', 'Security audit gate', 'Site validation gate']) {
+              const latest = checks.filter(c => c.name === name && c.app?.slug === 'github-actions').sort((a, b) => b.id - a.id)[0];
+              if (latest?.status !== 'completed' || latest.conclusion !== 'success') throw Error(`Required check not green: ${name}`);
+            }
             const {data: result} = await github.rest.pulls.merge({...args, sha: process.env.EXPECTED_SHA, merge_method: 'squash'});
             if (!result.merged) throw Error('Merge rejected');
             await github.rest.actions.createWorkflowDispatch({...context.repo, workflow_id: 'deploy-pages.yml', ref: 'main'});

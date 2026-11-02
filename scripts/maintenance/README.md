@@ -17,3 +17,12 @@ Run one cold and one warm deployment against unchanged content, compare Summary 
 Self-checks: `node scripts/maintenance/dependabot-policy.cjs` and `node scripts/maintenance/cache-selftest.cjs`.
 
 No changes are made to Notion webhook debouncing, upstream synchronization, route counts or concurrency limits. Those require separate measurements or Worker access.
+
+
+## Security release gates
+
+Full security audit runs for every PR and produces Security audit gate. It includes complete lockfile and vendored advisories, SHA-256 pinned actionlint/Gitleaks binaries, current files and complete reachable Git history, Python compilation and shell syntax. Secret matches are fully redacted. The only new allowlist is one exact reviewed public Cloudflare beacon ID, never a file-wide exemption.
+
+Site export validation runs for every PR and always produces Site validation gate. Only explicit documentation paths may skip an export. File renames are classified as deletion plus addition. Missing/cancelled/failed jobs fail closed. Fork code is not given the Notion build credential. Same-repository Dependabot is accepted only for existing dependency version/lock changes with all other manifest fields unchanged. The separately privileged dependency-maintenance flow also waits for both gates and Python CodeQL, including at its final merge step.
+
+After these status names have run successfully, the owner must add Security audit gate, Site validation gate and Analyze (python) to the main ruleset's required checks. The current connector cannot edit administration settings. Do not remove the five existing checks. Pages remains manual for ordinary source changes; the established narrow Dependabot allowlist still has its documented automatic release path.

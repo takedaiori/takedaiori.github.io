@@ -7,12 +7,24 @@ const patterns = [
   ['private-key', /-----BEGIN (?:RSA |EC |OPENSSH |ENCRYPTED )?PRIVATE KEY-----[\r\n]+[A-Za-z0-9+/=\r\n]{64,}/],
   ['github-token', /(?:gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{60,})/],
   ['openai-project-key', /sk-proj-[A-Za-z0-9_-]{40,}/],
-  ['supabase-secret-key', /sb_secret_[A-Za-z0-9_-]{24,}/]
+  ['supabase-secret-key', /sb_secret_[A-Za-z0-9_-]{24,}/],
+  ['clerk-secret-key', /sk_(?:live|test)_[A-Za-z0-9_-]{20,}/],
+  ['notion-secret-key', /(?:ntn_|secret_)[A-Za-z0-9]{32,}/],
+  ['redis-credential-url', /rediss?:\/\/[^\s"'<>]+:[^\s"'<>]+@/]
 ]
+function containsServiceRoleJwt(value) {
+  return [...value.matchAll(/eyJ[A-Za-z0-9_-]{5,}\.([A-Za-z0-9_-]{5,})\.[A-Za-z0-9_-]{10,}/g)].some(match => {
+    try { return JSON.parse(Buffer.from(match[1], 'base64url').toString()).role === 'service_role' } catch { return false }
+  })
+}
+function configuredSecrets(env = process.env) {
+  const names = new Set(['BUILD_CACHE_KEY', 'NOTION_TOKEN', 'NOTION_TOKEN_V2', 'ALGOLIA_ADMIN_APP_KEY', 'CLERK_SECRET_KEY', 'SUPABASE_SECRET_KEY', 'SUPABASE_SERVICE_ROLE_KEY', 'REDIS_URL', 'REVALIDATION_TOKEN', 'CACHE_REVALIDATION_TOKEN', 'CLAUDE_CONTRIBUTION_TRIGGER_TOKEN'])
+  return Object.entries(env).filter(([key]) => names.has(key) || key.startsWith('SCAN_SECRET_')).map(([, value]) => value).filter(Boolean)
+}
 const bucket = file => file.startsWith('_next/static/') ? 'js-css-fonts' : file.startsWith('_next/data/') ? 'page-json' : file.endsWith('.html') ? 'html' : 'assets'
 function audit(root, baseline, secrets = []) {
   const files = {}, groups = {}, findings = [], scriptHosts = new Set()
-  const hasSecret = value => patterns.some(([, pattern]) => pattern.test(value)) || secrets.some(secret => secret.length >= 20 && value.includes(secret))
+  const hasSecret = value => containsServiceRoleJwt(value) || patterns.some(([, pattern]) => pattern.test(value)) || secrets.some(secret => secret.length >= 20 && value.includes(secret))
   const safeIdentifier = value => hasSecret(value)
     ? `[redacted-${crypto.createHash('sha256').update(value).digest('hex').slice(0, 12)}]` : value
   function walk(dir) {
@@ -32,6 +44,7 @@ function audit(root, baseline, secrets = []) {
       if (!textTypes.has(path.extname(rawRel).toLowerCase())) continue
       const text = fs.readFileSync(full, 'utf8')
       for (const [rule, pattern] of patterns) if (pattern.test(rule === 'private-key' ? text.replace(/\\r\\n|\\n|\\r/g, '\n') : text)) findings.push({ file: rel, rule })
+      if (containsServiceRoleJwt(text)) findings.push({ file: rel, rule: 'supabase-service-role-jwt' })
       if (secrets.some(secret => secret.length >= 20 && text.includes(secret))) findings.push({ file: rel, rule: 'configured-secret' })
       if (/\.html?$/i.test(rawRel)) {
         for (const match of text.matchAll(/<script\b[^>]*\bsrc\s*=\s*["']((?:https?:)?\/\/[^"']+)["']/gi)) {
@@ -64,7 +77,7 @@ function main() {
   let baseline = null
   const baselinePath = process.env.SITE_AUDIT_BASELINE || '.perf/baseline.json'
   if (fs.existsSync(baselinePath)) baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'))
-  const secrets = Object.entries(process.env).filter(([key]) => key.startsWith('SCAN_SECRET_')).map(([, value]) => value)
+  const secrets = configuredSecrets()
   const report = audit(root, baseline, secrets)
   fs.mkdirSync(reportDir, { recursive: true })
   fs.writeFileSync(path.join(reportDir, 'site-audit-report.json'), JSON.stringify(report, null, 2) + '\n')
@@ -82,5 +95,5 @@ function main() {
   for (const finding of report.findings) console.error(`Artifact scan blocked: ${finding.rule} in ${safe(finding.file)}`)
   if (report.findings.length) process.exitCode = 1
 }
-module.exports = { audit, bucket }
+module.exports = { audit, bucket, configuredSecrets }
 if (require.main === module) main()

@@ -5,10 +5,19 @@ on:
     - cron: '23 3 * * 1'
   pull_request:
     branches: [main]
-    paths: ['scripts/maintenance/*page*', '.github/workflows/install-page-media-pack.yml', 'vendored-resources.json', 'components/Lenis.js', 'components/FullScreenButton.js', 'lib/plugins/wow.js', 'next.config.js', 'package.json', 'yarn.lock', 'scripts/maintenance/*audit*', 'scripts/maintenance/security-surface-check.cjs', 'public/**', 'components/External*', 'components/VConsole.js', 'pages/auth/**', 'pages/api/auth/**', 'lib/security/**', '.github/workflows/security-audit.yml']
 permissions:
   contents: read
 jobs:
+  gate:
+    name: Security audit gate
+    needs: [audit, maintenance-static]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          AUDIT_RESULT: ${{ needs.audit.result }}
+          STATIC_RESULT: ${{ needs.maintenance-static.result }}
+        run: test "$AUDIT_RESULT" = success && test "$STATIC_RESULT" = success
   audit:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -32,3 +41,24 @@ jobs:
             .perf/vendored-resource-audit.json
           retention-days: 30
           if-no-files-found: warn
+  maintenance-static:
+    name: Maintenance code & history secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install SHA-256 pinned security tools
+        run: python scripts/maintenance/install-audit-tools.py
+      - name: Validate workflow semantics
+        run: .tmp/audit-tools/actionlint -shellcheck=.tmp/audit-tools/shellcheck
+      - name: Compile all tracked Python maintenance code
+        run: python -m compileall -q scripts/maintenance pushUrl.py
+      - name: Check shell maintenance syntax
+        run: bash -n scripts/update.sh && .tmp/audit-tools/shellcheck scripts/update.sh
+      - name: Scan complete reachable Git history without exposing matching values
+        run: .tmp/audit-tools/gitleaks git --redact=100 --no-banner --log-opts=--all
+      - name: Scan current files, including uncommitted PR additions
+        run: .tmp/audit-tools/gitleaks dir --redact=100 --no-banner --max-target-megabytes=20
