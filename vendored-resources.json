@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "reviewedAt": "2026-11-02",
+  "local": [
+    {
+      "path": "public/js/lenis.js",
+      "package": "@studio-freight/lenis",
+      "version": "0.2.28",
+      "queryAllVersions": true,
+      "sha256": "4bfef16a68ecfd6e789ed42707ee9cf3c56abe8bcbe03b4eb49ad3580f177151",
+      "identification": "Self-declared window.lenisVersion; transpiled bundle, not byte-identical to the npm UMD build. Query all package versions conservatively."
+    },
+    {
+      "path": "public/js/typed.min.js",
+      "package": "typed.js",
+      "version": "2.0.12",
+      "queryAllVersions": false,
+      "sha256": "e0677eff376a1a6dcf1473db92654615ef7a3ac7d64fdec5f5dacb09e825c474",
+      "identification": "Normalized JavaScript AST matches the official npm release; changes are formatting and equivalent object key quoting."
+    },
+    {
+      "path": "public/css/wow/animate.css",
+      "package": "animate.css",
+      "version": "3.7.2",
+      "queryAllVersions": false,
+      "sha256": "b84694a6f8baad3c95ea65364a3e7a3743c944ec4c1d2105fb9cce24af8094a5",
+      "identification": "Banner identifies a local subset; reviewed CSS contains no import, resource URL, expression or behavior declarations."
+    }
+  ],
+  "remote": [
+    {
+      "package": "wowjs",
+      "version": "1.1.2",
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js",
+      "integrity": "sha384-V27yAyb3yYhZbiwaK9Sgxh9Cywkf/H2al4wcrcp/hKF9ZYT7d5saGJFoO/0v1Cgs",
+      "loader": "lib/plugins/wow.js",
+      "identification": "Reviewed CDN artifact; pinned by SHA-384. Not byte-identical to the npm wowjs build."
+    }
+  ]
+}

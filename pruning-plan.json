@@ -4,19 +4,9 @@
   "dependencies": [],
   "assets": [
     {
-      "path": "public/reward_code_wechat.png",
-      "bytes": 122465,
-      "sha256": "bd23f59058884937970f9131073695195b11216243b41f65b259a0cc69f8eeab"
-    },
-    {
-      "path": "public/reward_code_alipay.png",
-      "bytes": 116860,
-      "sha256": "957c446507d43f47057502e3e5437f4bbf4d576529bd4eefda4a9a49a6ec966e"
-    },
-    {
-      "path": "public/qrcode.png",
-      "bytes": 2305,
-      "sha256": "182639789301fc62bb69676ab51c3ae34d586819761502f21b46a0f81670a8c1"
+      "path": "public/js/fullscreen.js",
+      "bytes": 979,
+      "sha256": "f5be31598869fa7c08cde67ddff6fc892833e1989bdbfc00449932ae3c490833"
     }
   ]
 }
