@@ -1,0 +1,26 @@
+[
+  {
+    "version": "7.1.7",
+    "file": "glob.js",
+    "original": "0b622b7e67ccbaeb2beaadc5cf75d9a17cd93b5958253e4f62cc9d3d4855c5bc",
+    "patched": "83173baae49eadba20f35e17602df588e19024eee563c6c95f9c7829a01ee204"
+  },
+  {
+    "version": "7.1.7",
+    "file": "sync.js",
+    "original": "e2dd374ebb6fba21c3fc359b7e205d3959809c535a8c47357150d194a3d07e89",
+    "patched": "d3009ee030b31c9307d6595ce2689346e4dcf7e6dd833a5f9a731e7619871666"
+  },
+  {
+    "version": "7.2.3",
+    "file": "glob.js",
+    "original": "b8f35657ca927593d0f9e1aae3a8cfe9c33c697bf3c5733c2f6727f25ae25be1",
+    "patched": "5ea8fdb86e83c0c178625a724a47c3ae19bf9d177de21f83d779de1764a1b7a7"
+  },
+  {
+    "version": "7.2.3",
+    "file": "sync.js",
+    "original": "0f61227f4b55297f1ad16798c53e6a6dd55d633856f153133716413b7c5f61ad",
+    "patched": "add06c3ea77da200e484dade81b88eebf53f138a70e6fe6f6f8a088229fda036"
+  }
+]

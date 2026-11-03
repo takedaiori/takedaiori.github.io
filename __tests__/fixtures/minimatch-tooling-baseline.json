@@ -1,0 +1,55 @@
+{
+  "files": [
+    "lib/a.js",
+    "lib/deep/b.cjs",
+    "lib/.hidden.js",
+    "components/Card.js",
+    "components/deep/Panel.js",
+    "components/style.css",
+    "__tests__/a.test.js",
+    "__tests__/deep/b.test.js",
+    "node_modules/dep/index.js",
+    "src/main.ts",
+    "src/main.test.js",
+    "src/a.d.ts",
+    "src/中文.js",
+    "docs/readme.md",
+    "README.md",
+    "SECURITY.md",
+    ".config.js",
+    "lib/data.json",
+    "src/deep/util.js",
+    "test/helpers.js"
+  ],
+  "paths": {
+    "{lib,components}/**/*.{js,cjs}": [
+      "components/Card.js",
+      "components/deep/Panel.js",
+      "lib/a.js",
+      "lib/deep/b.cjs"
+    ],
+    "__tests__/**/*.test.js": [
+      "__tests__/a.test.js",
+      "__tests__/deep/b.test.js"
+    ],
+    "**/.*": [
+      ".config.js",
+      "lib/.hidden.js"
+    ],
+    "**/{README,SECURITY}.md": [
+      "README.md",
+      "SECURITY.md"
+    ]
+  },
+  "coverage": [
+    ".config.js",
+    "components/Card.js",
+    "components/deep/Panel.js",
+    "lib/.hidden.js",
+    "lib/a.js",
+    "lib/deep/b.cjs",
+    "src/deep/util.js",
+    "src/main.ts",
+    "src/中文.js"
+  ]
+}
