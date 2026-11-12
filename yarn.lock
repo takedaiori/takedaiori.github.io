@@ -1312,10 +1312,10 @@
   resolved "https://registry.yarnpkg.com/@netlify/plugin-nextjs/-/plugin-nextjs-5.16.5.tgz#0cfd70e67c3fc2554089302871a0d23d74ec166c"
   integrity sha512-pt0j/YCZr5Kn2ziGS4Ps+RvREEn5LN2M9iv9iqEgNWZGb4esu7MCMy4RIYS0UR3JuBHxVtsvPHo0gEv+RKFpag==
 
-"@next/bundle-analyzer@15.5.28":
-  version "15.5.28"
-  resolved "https://registry.npmjs.org/@next/bundle-analyzer/-/bundle-analyzer-15.5.28.tgz#1edccd334ce5b1a1f13b54fa1221a860e507a00d"
-  integrity sha512-UFkdV8LBt6mfSO2V55an2zVIRkUJeGhPU+t/jzNYh44tBcZIiA5tU73pYU6WKDVTd4aDR7LjL6pWKijoJitfUQ==
+"@next/bundle-analyzer@15.5.29":
+  version "15.5.29"
+  resolved "https://registry.yarnpkg.com/@next/bundle-analyzer/-/bundle-analyzer-15.5.29.tgz#349d9b4c8933fa4cae17b83a0479dd2f33cbc399"
+  integrity sha512-DeAHGxgoIfNE8B7RcLNQ91ObB+Pzb+ZMmTXzqltzZnjbE1hJ1sSyZWq3zKXQr9sYN72xKU4njGaCKsque8rd5Q==
   dependencies:
     webpack-bundle-analyzer "4.10.1"
 
@@ -1515,58 +1515,22 @@
   resolved "https://registry.npmjs.org/@stablelib/base64/-/base64-1.0.1.tgz#bdfc1c6d3a62d7a3b7bbc65b6cce1bb4561641be"
   integrity sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ==
 
-"@supabase/auth-js@2.118.0":
-  version "2.118.0"
-  resolved "https://registry.yarnpkg.com/@supabase/auth-js/-/auth-js-2.118.0.tgz#3da33e7835488beff8e09ef607f9856f647fcae5"
-  integrity sha512-xWfPXyhS2KDSfAneMtI6p/tBnbdiz/5vaRKXEqUfzfC9WCniKr2Ds5o5G7RIGig0bom4z6wUY9zaV07WDVTfnQ==
-  dependencies:
-    tslib "2.8.1"
 
-"@supabase/functions-js@2.118.0":
-  version "2.118.0"
-  resolved "https://registry.yarnpkg.com/@supabase/functions-js/-/functions-js-2.118.0.tgz#641339a9611b69dd2982990841d7516ec622976a"
-  integrity sha512-4ofletPa/noKAU6KHeqsd3FztGzRPUEJRey1MKY0o+PIHaVePqRPShIXtl37gcVyIWaFM+zNg6r9zh0uUSFOSA==
-  dependencies:
-    tslib "2.8.1"
+
+
 
 "@supabase/phoenix@0.4.5":
   version "0.4.5"
   resolved "https://registry.yarnpkg.com/@supabase/phoenix/-/phoenix-0.4.5.tgz#28f6a0dc020f53f171899b9c6021eecfe2a112d1"
   integrity sha512-aAn9H9ovVyeApKy11OWOrrOGq8DV68yWeH4ud2lN9fzn4aO8Zb5GLL9m1pUg9nLqIcT+ZDfAcsZe0E/nqdv2lw==
 
-"@supabase/postgrest-js@2.118.0":
-  version "2.118.0"
-  resolved "https://registry.yarnpkg.com/@supabase/postgrest-js/-/postgrest-js-2.118.0.tgz#f1bb578171ddb43682191d204db938351509796a"
-  integrity sha512-JXy+37KPApHsyotaQACovv/Jy9E22rfiWLRuT+2UjoEAcAIelDFIrsF/FY47Dy19mO7lI0Tq+zDCX8oJ2Ozfiw==
-  dependencies:
-    tslib "2.8.1"
 
-"@supabase/realtime-js@2.118.0":
-  version "2.118.0"
-  resolved "https://registry.yarnpkg.com/@supabase/realtime-js/-/realtime-js-2.118.0.tgz#0fdca012bcb3e4ce7ce55ea1ca55108a9966ec6b"
-  integrity sha512-pzCIEWjqD5/xqEZQerpt+q9rsgYkcrkgCJgf0W2ULqC4fYUeB/p9CFa3t9vn+IVh6dMN9r4ZCE262lZvUC+Bfw==
-  dependencies:
-    "@supabase/phoenix" "0.4.5"
-    tslib "2.8.1"
 
-"@supabase/storage-js@2.118.0":
-  version "2.118.0"
-  resolved "https://registry.yarnpkg.com/@supabase/storage-js/-/storage-js-2.118.0.tgz#54cc58438eb5927e5c98104c6694e130e5395f61"
-  integrity sha512-5MNkKt2Moy7Jud/sPX7/28BwdDxZMCVHGJT00b8op3KRa9LKSjOAYU5IcfGWIstaasAqY8GkbA6oI3IRDgB1YQ==
-  dependencies:
-    iceberg-js "^0.8.1"
-    tslib "2.8.1"
 
-"@supabase/supabase-js@^2.118.0":
-  version "2.118.0"
-  resolved "https://registry.yarnpkg.com/@supabase/supabase-js/-/supabase-js-2.118.0.tgz#a590a3a0b301cb336c771a81c8d37a4bbc2647cf"
-  integrity sha512-FxI8UXMVC2UG7IkeiI8fuQZqq2oI3JeSuN8MPIC2RLVaoEAxKS0nqE6kii9Ewpq8f9gNPM6git1Y8f0vN/QLFw==
-  dependencies:
-    "@supabase/auth-js" "2.118.0"
-    "@supabase/functions-js" "2.118.0"
-    "@supabase/postgrest-js" "2.118.0"
-    "@supabase/realtime-js" "2.118.0"
-    "@supabase/storage-js" "2.118.0"
+
+
+
+
 
 "@swc/helpers@0.5.15":
   version "0.5.15"
@@ -1900,13 +1864,7 @@
   resolved "https://registry.yarnpkg.com/@vercel/analytics/-/analytics-1.6.1.tgz#b4e16daf445cf6cd365a91e43d86e9e5b3428ddc"
   integrity sha512-oH9He/bEM+6oKlv3chWuOOcp8Y6fo6/PSro8hEkgCW3pu9/OiCXiUpRUogDh3Fs3LH2sosDrx8CxeOLBEE+afg==
 
-"@vercel/cli-config@0.3.5":
-  version "0.3.5"
-  resolved "https://registry.yarnpkg.com/@vercel/cli-config/-/cli-config-0.3.5.tgz#28f0852cd49e4ca31fe025cac078f4d39c4608cb"
-  integrity sha512-O7y3EFzHENSLtE/3fjM3vIRqDpFFhZor2dMcZaND4G1d88gQk9u8yBcZhRR9CKnBowgzXdl0qcXkuINI05I72w==
-  dependencies:
-    xdg-app-paths "5"
-    zod "4.1.11"
+
 
 "@vercel/cli-exec@1.0.1":
   version "1.0.1"
@@ -1915,21 +1873,9 @@
   dependencies:
     execa "5.1.1"
 
-"@vercel/functions@^3.10.5":
-  version "3.10.5"
-  resolved "https://registry.yarnpkg.com/@vercel/functions/-/functions-3.10.5.tgz#7dd4426cf0de5ad21148782a9a0e3970a5cda962"
-  integrity sha512-IDqsDlIbVjWk5zoV63N41vKSShH3LgJ8Y5gAQc+dq7HEkHRrVh3naJ/klZxit4B8G+8WEK7ezb/tkOU2g3UViw==
-  dependencies:
-    "@vercel/oidc" "4.0.5"
 
-"@vercel/oidc@4.0.5":
-  version "4.0.5"
-  resolved "https://registry.yarnpkg.com/@vercel/oidc/-/oidc-4.0.5.tgz#b7e19b9194059946d9044189545973f04a4133ab"
-  integrity sha512-E+duTxv0W8r3qNCGUYxTLt0V0BlLUlrEqxYOu2OoFubIbxwGjwm4wofache+YgU6Sr0MwoAA/vsSrrNrrWjimw==
-  dependencies:
-    "@vercel/cli-config" "0.3.5"
-    "@vercel/cli-exec" "1.0.1"
-    jose "^5.9.6"
+
+
 
 "@vue/compiler-core@3.5.44":
   version "3.5.44"
@@ -8183,7 +8129,81 @@ yocto-queue@^1.2.1:
   resolved "https://registry.npmjs.org/yocto-queue/-/yocto-queue-1.2.2.tgz"
   integrity sha512-4LCcse/U2MHZ63HAJVE+v71o7yOdIe4cZ70Wpf8D/IyjDKYQLV5GD46B+hSTjJsvV5PztjvHoU580EftxjDZFQ==
 
-zod@4.1.11, zod@^4.6.5, zod@^4.6.7:
+
+
+"@supabase/auth-js@2.119.0":
+  version "2.119.0"
+  resolved "https://registry.yarnpkg.com/@supabase/auth-js/-/auth-js-2.119.0.tgz#37faba2c8ef618e5621be7aa6fcb61ac61bd0650"
+  integrity sha512-WI7KqJRxqZjm77PlRO/VfKretL4SG8g8stWfBmpyx9To+fFapZlSbXA8QkduoMvr72rRpIF24ZLrjktBrp+ZFA==
+  dependencies:
+    tslib "2.8.1"
+
+"@supabase/functions-js@2.119.0":
+  version "2.119.0"
+  resolved "https://registry.yarnpkg.com/@supabase/functions-js/-/functions-js-2.119.0.tgz#4023c236947fa75385d88187af1463b547bac77d"
+  integrity sha512-0aOdF/Y4lA+62K02nwZClfAthXmFEml0od42q3yy/9t3bBitomAOYEatTFSnxT/5UeeIDNn2DOnXTdAP0sqGNQ==
+  dependencies:
+    tslib "2.8.1"
+
+"@supabase/postgrest-js@2.119.0":
+  version "2.119.0"
+  resolved "https://registry.yarnpkg.com/@supabase/postgrest-js/-/postgrest-js-2.119.0.tgz#8ece6fa011442e848575a65798e7df3991273557"
+  integrity sha512-qBmcjEFO7Ptyf5qvOXYJa1s4bfA4zsMIFf2i+h2zd6RRTDLwquX8z1mnS9djNOJjbiO1OGFh5Y2Lc2k2pA8TMw==
+  dependencies:
+    tslib "2.8.1"
+
+"@supabase/realtime-js@2.119.0":
+  version "2.119.0"
+  resolved "https://registry.yarnpkg.com/@supabase/realtime-js/-/realtime-js-2.119.0.tgz#0b04f695afb1cfc81b03989247c9a7ca4c58b844"
+  integrity sha512-fPzxt+SAYweqsZUCSZma2dvN+HT6lVjwWj8BbkVwapW6wNf1odUi+ATYN7svX4Zm9vt0kz0l0VzINAUAA38FEg==
+  dependencies:
+    "@supabase/phoenix" "0.4.5"
+    tslib "2.8.1"
+
+"@supabase/storage-js@2.119.0":
+  version "2.119.0"
+  resolved "https://registry.yarnpkg.com/@supabase/storage-js/-/storage-js-2.119.0.tgz#1aa207b87ebbaa10a21a9815b0fa4aa15c783905"
+  integrity sha512-htx1dSCnSJVPlx2BNSgLSUDvLMxuGbYa6pUPl5xoCs4as4cIhBVwuxj78zbggCyPHxLnEXjsV/qvlDsVjpodKw==
+  dependencies:
+    iceberg-js "^0.8.1"
+    tslib "2.8.1"
+
+"@supabase/supabase-js@^2.119.0":
+  version "2.119.0"
+  resolved "https://registry.yarnpkg.com/@supabase/supabase-js/-/supabase-js-2.119.0.tgz#ac8d844b46fa0b68ae2b0400950b3a2de52b1a62"
+  integrity sha512-MKP49G6bJbPhvsZDegZ/IXS/ITApPgplDCF5+F65KZ5kIArS5Y90WFxwvWYALx2bsxdrSuHvkCiXHYr3dU8+sw==
+  dependencies:
+    "@supabase/auth-js" "2.119.0"
+    "@supabase/functions-js" "2.119.0"
+    "@supabase/postgrest-js" "2.119.0"
+    "@supabase/realtime-js" "2.119.0"
+    "@supabase/storage-js" "2.119.0"
+
+"@vercel/cli-config@0.3.7":
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/@vercel/cli-config/-/cli-config-0.3.7.tgz#56370bf86d52bde1ba6bc64cde506e84404c6eab"
+  integrity sha512-bHFJcUF2sUsB/6XfS+BWAYjD7DIt1xyhz6oOAvGEBua0S4P+pKQ04O6vZ3jLw1HMX1ZNKP9lyGpoiqgToqI7GQ==
+  dependencies:
+    xdg-app-paths "5"
+    zod "^4.6.6"
+
+"@vercel/functions@^3.11.0":
+  version "3.11.0"
+  resolved "https://registry.yarnpkg.com/@vercel/functions/-/functions-3.11.0.tgz#e91686725466f2d3dfa3651b169ecb6beecb99c7"
+  integrity sha512-LKwNcV4Jwb8GpovADePfassmsR2gRL5OeKcQzrWfLOJaRX3MHbeUPqAurCAneKrKa8hxnWa4H5bCFreLSvHedA==
+  dependencies:
+    "@vercel/oidc" "4.0.7"
+
+"@vercel/oidc@4.0.7":
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/@vercel/oidc/-/oidc-4.0.7.tgz#8628a527a4c1f1490f4b070bb5ce3d0f0255e841"
+  integrity sha512-ZiplzlXLWdKPj36yp23LBwaKWt4hR+kNULULeMVwtrx+iDpxnMk1nFKiHEtUWRjGpnqi/rDGwtnE/Xkfl9xXvQ==
+  dependencies:
+    "@vercel/cli-config" "0.3.7"
+    "@vercel/cli-exec" "1.0.1"
+    jose "^5.9.6"
+
+zod@^4.6.5, zod@^4.6.6, zod@^4.6.7:
   version "4.6.7"
   resolved "https://registry.npmjs.org/zod/-/zod-4.6.7.tgz#e806cf64a7f4e37635ce9f2f52c04c3766f75e5b"
   integrity sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg==
