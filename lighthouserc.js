@@ -16,7 +16,6 @@ module.exports = {
         'categories:accessibility': ['error', { minScore: 0.9 }],
         'categories:best-practices': ['warn', { minScore: 0.8 }],
         'categories:seo': ['error', { minScore: 0.9 }],
-        'categories:pwa': ['warn', { minScore: 0.6 }],
         
         // Core Web Vitals
         'first-contentful-paint': ['warn', { maxNumericValue: 2000 }],
@@ -35,9 +34,7 @@ module.exports = {
         'link-name': 'error',
         
         // Best Practices
-        'uses-https': 'error',
         'is-on-https': 'error',
-        'uses-http2': 'warn',
         
         // SEO
         'document-title': 'error',
