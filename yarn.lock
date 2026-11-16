@@ -1216,12 +1216,12 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@lhci/cli@^0.16.0":
-  version "0.16.0"
-  resolved "https://registry.yarnpkg.com/@lhci/cli/-/cli-0.16.0.tgz#a2eccb8828d1fdf2beca6ba5fee78057d1733e27"
-  integrity sha512-CLEpafl9ECTcY6gsUv86C6c5idpQzDcwd/aJO15YFeB+YnutBIfPlSO7vQFDtxgwU+vaUcs4cCMUCglnvy9nDA==
+"@lhci/cli@^0.16.1":
+  version "0.16.1"
+  resolved "https://registry.yarnpkg.com/@lhci/cli/-/cli-0.16.1.tgz#3632419681dcf66d63d5cecc8386285be8c83317"
+  integrity sha512-Vh3z9Xkcs4ULrl62NTF9a+c9HL9teyD+dq3TueG4p4oo9ypYbPBb3Ht4YvxHzOyr31rFaiuHqdphpnVZs5SXQw==
   dependencies:
-    "@lhci/utils" "0.16.0"
+    "@lhci/utils" "0.16.1"
     chrome-launcher "^0.13.4"
     compression "^1.8.2"
     debug "^4.4.3"
@@ -1231,15 +1231,15 @@
     lighthouse "13.6.0"
     lighthouse-logger "1.2.0"
     open "^8.4.2"
-    proxy-agent "^6.5.0"
+    proxy-agent "^8.0.2"
     uuid "^14.0.3"
     yargs "^15.4.1"
     yargs-parser "^13.1.2"
 
-"@lhci/utils@0.16.0":
-  version "0.16.0"
-  resolved "https://registry.yarnpkg.com/@lhci/utils/-/utils-0.16.0.tgz#5c2ee7328ddffe6143e268448d3cac3d4bc0de64"
-  integrity sha512-jTvAYsCFnRKmbs+qEyCXnXmxf85kBDAaGhvyEah7zT7AjLJc8XqPTKhALT9i31Kxm7rQAQnRx58NNRiGYjGY5Q==
+"@lhci/utils@0.16.1":
+  version "0.16.1"
+  resolved "https://registry.yarnpkg.com/@lhci/utils/-/utils-0.16.1.tgz#de5c1c5ea58376cd929248af64dcb01a2b8964ef"
+  integrity sha512-+hiBITsPkxtMnHJLuL7K6I3DPzanfsfPoBobj24ThdcB/eqgkuqjyXU6PmujObPofx1fWNxMJFq2LdHabzgDAA==
   dependencies:
     debug "^4.4.3"
     isomorphic-fetch "^3.0.0"
@@ -1753,11 +1753,6 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-2.0.1.tgz#35adc6222e3662fa2222ce123b961476a746b9ea"
   integrity sha512-HqmEUIGRJ5fSXchkVgR5F7qn48bDBzv0kWj/Kfu5e6uci4UlEeng4331LnBkWffb++Ei3FOVLxo8JJWMFBDMeQ==
 
-"@tootallnate/quickjs-emscripten@^0.23.0":
-  version "0.23.0"
-  resolved "https://registry.npmmirror.com/@tootallnate/quickjs-emscripten/-/quickjs-emscripten-0.23.0.tgz"
-  integrity sha512-C5Mc6rdnsaJDjO3UpGW/CQTHtCKaYlScZTly4JIu97Jxo/odCiH0ITnDXSJPTOrEKk/ycSZ0AOgTmkDtkOsvIA==
-
 "@types/aria-query@^5.0.1":
   version "5.0.4"
   resolved "https://registry.npmjs.org/@types/aria-query/-/aria-query-5.0.4.tgz"
@@ -2238,10 +2233,10 @@ agent-base@6:
   dependencies:
     debug "4"
 
-agent-base@^7.1.0, agent-base@^7.1.2:
-  version "7.1.4"
-  resolved "https://registry.npmmirror.com/agent-base/-/agent-base-7.1.4.tgz"
-  integrity sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==
+agent-base@9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/agent-base/-/agent-base-9.0.0.tgz#ec9efb08314e1e75b0852d74aabf9a387f99834e"
+  integrity sha512-TQf59BsZnytt8GdJKLPfUZ54g/iaUL2OWDSFCCvMOhsHduDQxO8xC4PNeyIkVcA5KwL2phPSv0douC0fgWzmnA==
 
 ajv-formats@^3.0.1:
   version "3.0.1"
@@ -2634,7 +2629,7 @@ baseline-browser-mapping@^2.11.20:
   resolved "https://registry.yarnpkg.com/baseline-browser-mapping/-/baseline-browser-mapping-2.11.23.tgz#304c980a35de0f460cf12985359d6e11494c1ab4"
   integrity sha512-le521dGVfxM7yRX0EikCoSz+rOK+hHzdDt/E7mG1jOJB/6WAAUuwVroLwaB7ApaUsz5Q0kFlDXLSA9MheUIfRQ==
 
-basic-ftp@^5.0.2, basic-ftp@^6.2.1:
+basic-ftp@^5.3.1, basic-ftp@^6.2.1:
   version "6.2.5"
   resolved "https://registry.npmjs.org/basic-ftp/-/basic-ftp-6.2.5.tgz#cb2a04e6ae1e961d2f832357dc99f3f4978eb87e"
   integrity sha512-JJKYwxdbJM6Z4jFO+ciaIUejHRCyIg6oJ9hoAzuZ0EMlJsHDT07h6vZt4NH8G61DLzddrDKvjoRqfewnPzDSJA==
@@ -3139,10 +3134,10 @@ damerau-levenshtein@^1.0.8:
   resolved "https://registry.npmmirror.com/damerau-levenshtein/-/damerau-levenshtein-1.0.8.tgz"
   integrity sha512-sdQSFB7+llfUcQHUQO3+B8ERRj0Oa4w9POWMI/puGtuf7gFywGmkaLCElnudfTiKZV+NvHqL0ifzdrI8Ro7ESA==
 
-data-uri-to-buffer@^6.0.2:
-  version "6.0.2"
-  resolved "https://registry.npmmirror.com/data-uri-to-buffer/-/data-uri-to-buffer-6.0.2.tgz"
-  integrity sha512-7hvf7/GW8e86rW0ptuwS3OcBGDjIi6SZva7hCyWC0yYry2cOPmLIjXAUHI6DK2HsnwJd9ifmt57i8eV2n4YNpw==
+data-uri-to-buffer@8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/data-uri-to-buffer/-/data-uri-to-buffer-8.0.0.tgz#c642ffbc96d8fae76cccecbad43cbddd7818c785"
+  integrity sha512-6UHfyCux51b8PTGDgveqtz1tvphBku5DrMKKJbFAZAJOI2zsjDpDoYE1+QGj7FOMS4BdTFNJsJiR3zEB0xH0yQ==
 
 data-urls@^3.0.2:
   version "3.0.2"
@@ -3303,10 +3298,10 @@ define-properties@^1.1.3, define-properties@^1.2.1:
     has-property-descriptors "^1.0.0"
     object-keys "^1.1.1"
 
-degenerator@^5.0.0:
-  version "5.0.1"
-  resolved "https://registry.npmmirror.com/degenerator/-/degenerator-5.0.1.tgz"
-  integrity sha512-TllpMR/t0M5sqCXfj85i4XaAzxmS5tVA16dqvdkMwGmzI+dXLXnw3J+3Vdv7VKw+ThlTMboK6i9rnZ6Nntj5CQ==
+degenerator@7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/degenerator/-/degenerator-7.0.1.tgz#9b057747a2e5d058b0ef8fd753faccc109957467"
+  integrity sha512-ABErK0IefDSyHjlPH7WUEenIAX2rPPnrDcDM+TS3z3+zu9TfyKKi07BQM+8rmxpdE2y1v5fjjdoAS/x4D2U60w==
   dependencies:
     ast-types "^0.13.4"
     escodegen "^2.1.0"
@@ -4366,13 +4361,13 @@ get-tsconfig@^4.7.5:
   dependencies:
     resolve-pkg-maps "^1.0.0"
 
-get-uri@^6.0.1:
-  version "6.0.5"
-  resolved "https://registry.npmmirror.com/get-uri/-/get-uri-6.0.5.tgz"
-  integrity sha512-b1O07XYq8eRuVzBNgJLstU6FYc1tS6wnMtF1I1D9lE8LxZSOGZ7LhxN54yPP6mGw5f2CkXY2BQUL9Fx41qvcIg==
+get-uri@8.0.1:
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/get-uri/-/get-uri-8.0.1.tgz#772b1418bf034c2c43ddd6a41af24a4262e135ee"
+  integrity sha512-/5N/P4Lrh0p/mDwlDRi7Y1+P2o/OyzZI3l6Iz1Ov6XXwwm1y3RlZLuo3gVgML99djrEDtV980bBxSuOeHLk8ww==
   dependencies:
-    basic-ftp "^5.0.2"
-    data-uri-to-buffer "^6.0.2"
+    basic-ftp "^5.3.1"
+    data-uri-to-buffer "8.0.0"
     debug "^4.3.4"
 
 glob-parent@^5.1.2, glob-parent@~5.1.2:
@@ -4569,6 +4564,15 @@ http-link-header@^1.1.1:
   resolved "https://registry.npmmirror.com/http-link-header/-/http-link-header-1.1.3.tgz"
   integrity sha512-3cZ0SRL8fb9MUlU3mKM61FcQvPfXx2dBrZW3Vbg5CXa8jFlK8OaEpePenLe1oEXQduhz8b0QjsqfS59QP4AJDQ==
 
+http-proxy-agent@9.1.0:
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/http-proxy-agent/-/http-proxy-agent-9.1.0.tgz#fd8b39dcb58ac8046139e5f4ea80de78e8beaf7b"
+  integrity sha512-2NxoveTT58mjYT4n3RPTEfCZGLMbidoO8XEieXfpSYxu+PQJ1qpx4ypwH6N+uF9twBPIvRRgvkvW5HUTYWENig==
+  dependencies:
+    agent-base "9.0.0"
+    debug "^4.3.4"
+    proxy-agent-negotiate "1.1.0"
+
 http-proxy-agent@^5.0.0:
   version "5.0.0"
   resolved "https://registry.npmjs.org/http-proxy-agent/-/http-proxy-agent-5.0.0.tgz"
@@ -4578,13 +4582,14 @@ http-proxy-agent@^5.0.0:
     agent-base "6"
     debug "4"
 
-http-proxy-agent@^7.0.0, http-proxy-agent@^7.0.1:
-  version "7.0.2"
-  resolved "https://registry.npmmirror.com/http-proxy-agent/-/http-proxy-agent-7.0.2.tgz"
-  integrity sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==
+https-proxy-agent@9.1.0:
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/https-proxy-agent/-/https-proxy-agent-9.1.0.tgz#a9f60f79bc1578c37b166dd7f58b6bcb5c57e44b"
+  integrity sha512-ag87y7cJJ9/3+GxFr8Oy4O5faDsGRGnBGsJj/YjOSsSx/5eadKLYTMPlzuR6obgoCDDm0abAAZitXXQkMOPSpA==
   dependencies:
-    agent-base "^7.1.0"
+    agent-base "9.0.0"
     debug "^4.3.4"
+    proxy-agent-negotiate "1.1.0"
 
 https-proxy-agent@^5.0.1:
   version "5.0.1"
@@ -4592,14 +4597,6 @@ https-proxy-agent@^5.0.1:
   integrity sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==
   dependencies:
     agent-base "6"
-    debug "4"
-
-https-proxy-agent@^7.0.6:
-  version "7.0.6"
-  resolved "https://registry.npmmirror.com/https-proxy-agent/-/https-proxy-agent-7.0.6.tgz"
-  integrity sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==
-  dependencies:
-    agent-base "^7.1.2"
     debug "4"
 
 human-signals@^2.1.0:
@@ -6426,26 +6423,26 @@ p-try@^2.0.0:
   resolved "https://registry.npmjs.org/p-try/-/p-try-2.2.0.tgz"
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
 
-pac-proxy-agent@^7.1.0:
-  version "7.2.0"
-  resolved "https://registry.npmmirror.com/pac-proxy-agent/-/pac-proxy-agent-7.2.0.tgz"
-  integrity sha512-TEB8ESquiLMc0lV8vcd5Ql/JAKAoyzHFXaStwjkzpOpC5Yv+pIzLfHvjTSdf3vpa2bMiUQrg9i6276yn8666aA==
+pac-proxy-agent@9.1.0:
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/pac-proxy-agent/-/pac-proxy-agent-9.1.0.tgz#cafd7bb54905de0b6804283cd273eb22028c6abd"
+  integrity sha512-1aU+1mpj3DrQPfo3gh+3Gap3G5x+axnMx1P/y0ZF2ch7kb2meyOCAH8K2k9d27ROsTE7TnAerzxqF9aon2jqnA==
   dependencies:
-    "@tootallnate/quickjs-emscripten" "^0.23.0"
-    agent-base "^7.1.2"
+    agent-base "9.0.0"
     debug "^4.3.4"
-    get-uri "^6.0.1"
-    http-proxy-agent "^7.0.0"
-    https-proxy-agent "^7.0.6"
-    pac-resolver "^7.0.1"
-    socks-proxy-agent "^8.0.5"
+    get-uri "8.0.1"
+    http-proxy-agent "9.1.0"
+    https-proxy-agent "9.1.0"
+    pac-resolver "9.0.1"
+    quickjs-wasi "^2.2.0"
+    socks-proxy-agent "10.1.0"
 
-pac-resolver@^7.0.1:
-  version "7.0.1"
-  resolved "https://registry.npmmirror.com/pac-resolver/-/pac-resolver-7.0.1.tgz"
-  integrity sha512-5NPgf87AT2STgwa2ntRMr45jTKrYBGkVU36yT0ig/n/GMAa3oPqhZfIQ2kMEimReg0+t9kZViDVZ83qfVUlckg==
+pac-resolver@9.0.1:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/pac-resolver/-/pac-resolver-9.0.1.tgz#a90b1518e4e832b3fcb197ada974d6f6ceaa7f8a"
+  integrity sha512-lJbS008tmkj08VhoM8Hzuv/VE5tK9MS0OIQ/7+s0lIF+BYhiQWFYzkSpML7lXs9iBu2jfmzBTLzhe9n6BX+dYw==
   dependencies:
-    degenerator "^5.0.0"
+    degenerator "7.0.1"
     netmask "^2.0.2"
 
 parent-module@^1.0.0:
@@ -6638,10 +6635,10 @@ prettier-linter-helpers@^1.0.1:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier@^3.9.10:
-  version "3.9.10"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.9.10.tgz#ac378e432f1a7381518f2e080816bbaefa38d585"
-  integrity sha512-skGHTH1Yb9QvaTC4hWnRTzEYtCpApF0UMBPz+t/0ZPzP8ihefo/btKd+QA7pUE0fEwA1SbS/NmhyEcstdXOIdA==
+prettier@^3.10.1:
+  version "3.10.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.10.1.tgz#00b1c1872f9650ec22093d5bdafdca0fe6760f77"
+  integrity sha512-70vp3ZUYoPlFbF9uiTdXHUUCGEIp7d4+6p+8DYbkm2jP7x/3i/paXVF6dopSI3zd/CEitrZN1rc4i85xWmmXlg==
 
 pretty-format@^27.0.2:
   version "27.5.1"
@@ -6691,26 +6688,26 @@ proxy-addr@^2.0.8, proxy-addr@~2.0.7:
     forwarded "0.2.0"
     ipaddr.js "1.9.1"
 
-proxy-agent@^6.5.0:
-  version "6.5.0"
-  resolved "https://registry.yarnpkg.com/proxy-agent/-/proxy-agent-6.5.0.tgz#9e49acba8e4ee234aacb539f89ed9c23d02f232d"
-  integrity sha512-TmatMXdr2KlRiA2CyDu8GqR8EjahTG3aY3nXjdzFyoZbmB8hrBsTyMezhULIXKnC0jpfjlmiZ3+EaCzoInSu/A==
-  dependencies:
-    agent-base "^7.1.2"
-    debug "^4.3.4"
-    http-proxy-agent "^7.0.1"
-    https-proxy-agent "^7.0.6"
-    lru-cache "^7.14.1"
-    pac-proxy-agent "^7.1.0"
-    proxy-from-env "^1.1.0"
-    socks-proxy-agent "^8.0.5"
-
-proxy-from-env@^1.1.0:
+proxy-agent-negotiate@1.1.0:
   version "1.1.0"
-  resolved "https://registry.npmmirror.com/proxy-from-env/-/proxy-from-env-1.1.0.tgz"
-  integrity sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==
+  resolved "https://registry.yarnpkg.com/proxy-agent-negotiate/-/proxy-agent-negotiate-1.1.0.tgz#de7d37aede9d71e74346125d6f484fac8092b615"
+  integrity sha512-N8IBcM3UgCVzz2L2Lqv8DVntDnnC8/hiV4nEDUPkqq72TPUgYWjQc+bdZlBPZK9LzPAvOY//gAt0S0DApoOXWQ==
 
-proxy-from-env@^2.1.0:
+proxy-agent@^8.0.2:
+  version "8.0.2"
+  resolved "https://registry.yarnpkg.com/proxy-agent/-/proxy-agent-8.0.2.tgz#70737a3b9cdc8bd7a282c9e6ff54a64f5252413c"
+  integrity sha512-idLLRewuemWd7GH/BDJzGiB0dWGfT2SQs3jy6NtZtGWU9uPTTSdeC1/cdbqLwgzhfv027daGFuXX426e2Eg20A==
+  dependencies:
+    agent-base "9.0.0"
+    debug "^4.3.4"
+    http-proxy-agent "9.1.0"
+    https-proxy-agent "9.1.0"
+    lru-cache "^7.14.1"
+    pac-proxy-agent "9.1.0"
+    proxy-from-env "^2.0.0"
+    socks-proxy-agent "10.1.0"
+
+proxy-from-env@^2.0.0, proxy-from-env@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-2.1.0.tgz"
   integrity sha512-cJ+oHTW1VAEa8cJslgmUZrc+sjRKgAKl3Zyse6+PV38hZe/V6Z14TbCuXcan9F9ghlz4QrFr2c92TNF82UkYHA==
@@ -6761,6 +6758,11 @@ queue-microtask@^1.2.2:
   version "1.2.3"
   resolved "https://registry.npmmirror.com/queue-microtask/-/queue-microtask-1.2.3.tgz"
   integrity sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==
+
+quickjs-wasi@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/quickjs-wasi/-/quickjs-wasi-2.2.0.tgz#85d8984aa1b048546e5634c764165034c6e22d48"
+  integrity sha512-zQxXmQMrEoD3S+jQdYsloq4qAuaxKFHZj6hHqOYGwB2iQZH+q9e/lf5zQPXCKOk0WJuAjzRFbO4KwHIp2D05Iw==
 
 range-parser@~1.2.1:
   version "1.2.1"
@@ -7378,12 +7380,12 @@ smart-buffer@^4.2.0:
   resolved "https://registry.npmmirror.com/smart-buffer/-/smart-buffer-4.2.0.tgz"
   integrity sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==
 
-socks-proxy-agent@^8.0.5:
-  version "8.0.5"
-  resolved "https://registry.npmmirror.com/socks-proxy-agent/-/socks-proxy-agent-8.0.5.tgz"
-  integrity sha512-HehCEsotFqbPW9sJ8WVYB6UbmIMv7kUUORIF2Nncq4VQvBfNBLibW9YZR5dlYCSUhwcD628pRllm7n+E+YTzJw==
+socks-proxy-agent@10.1.0:
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/socks-proxy-agent/-/socks-proxy-agent-10.1.0.tgz#8eaf7d64ad8752ca43ab04a1a9567be9b7fc40b1"
+  integrity sha512-WlMj/67cEJ6MDI1OcsnjuYKDNDoyPCCYZ249kuuXPiMDw9F8PXkVaQ7YWu3siTydfQ/4BEZcvGzu+aYvz7dDCQ==
   dependencies:
-    agent-base "^7.1.2"
+    agent-base "9.0.0"
     debug "^4.3.4"
     socks "^2.8.3"
 
