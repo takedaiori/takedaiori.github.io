@@ -71,7 +71,7 @@
     "@vercel/analytics": "^1.6.1",
     "@vercel/functions": "^3.11.0",
     "algoliasearch": "^4.27.0",
-    "axios": "^1.21.0",
+    "axios": "^1.21.1",
     "critters": "^0.0.25",
     "feed": "^4.2.2",
     "ioredis": "^5.11.1",
