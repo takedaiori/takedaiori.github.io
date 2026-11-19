@@ -64,7 +64,7 @@
   },
   "dependencies": {
     "@clerk/localizations": "^3.37.11",
-    "@clerk/nextjs": "6.39.8",
+    "@clerk/nextjs": "6.39.9",
     "@next/bundle-analyzer": "15.5.29",
     "@notionhq/client": "^2.2.15",
     "@supabase/supabase-js": "^2.119.0",
