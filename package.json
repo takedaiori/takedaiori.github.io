@@ -94,7 +94,7 @@
     "@netlify/plugin-nextjs": "^5.16.7",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^14.1.2",
-    "@testing-library/user-event": "^14.6.10",
+    "@testing-library/user-event": "^14.6.13",
     "@types/node": "22.20.5",
     "@types/react": "18.3.10",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
