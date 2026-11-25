@@ -67,7 +67,7 @@
     "@clerk/nextjs": "6.39.9",
     "@next/bundle-analyzer": "15.5.29",
     "@notionhq/client": "^2.2.15",
-    "@supabase/supabase-js": "^2.119.0",
+    "@supabase/supabase-js": "^2.119.2",
     "@vercel/analytics": "^1.6.1",
     "@vercel/functions": "^3.11.3",
     "algoliasearch": "^4.27.0",
